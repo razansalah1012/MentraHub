@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentraHub | Awareness Resources</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script th:inline="javascript">window.contextPath = /*[[@{/}]]*/ '/mentraApp/';</script>
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        /* Awareness Page Styles */
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .page-header p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Article Grid */
+        .article-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        /* Article Card */
+        .article-card {
+            background-color: var(--card);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(108, 116, 216, 0.15);
+        }
+        
+        .article-image {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .article-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .article-image .placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        
+        /* Placeholder backgrounds */
+        .bg-anxiety { background: linear-gradient(135deg, #E8D5E0 0%, #C9B8D4 100%); }
+        .bg-depression { background: linear-gradient(135deg, #FFD89E 0%, #F5A962 100%); }
+        .bg-stress { background: linear-gradient(135deg, #FFE4D6 0%, #E8C4B8 100%); }
+        .bg-mindfulness { background: linear-gradient(135deg, #D4E5F7 0%, #A8C5E0 100%); }
+        .bg-selfcare { background: linear-gradient(135deg, #D5ECD4 0%, #A8D4A8 100%); }
+        
+        .category-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: white;
+        }
+        
+        .tag-anxiety { background-color: #7DD3C0; }
+        .tag-depression { background-color: #E88B8B; }
+        .tag-stress { background-color: #9B6B9E; }
+        .tag-mindfulness { background-color: #6C74D8; }
+        .tag-selfcare { background-color: #7DD3C0; }
+        
+        .article-content {
+            padding: 20px 25px 25px;
+        }
+        
+        .article-content h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 8px;
+        }
+        
+        .article-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .read-time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding-bottom: 15px;
+            border-bottom: 1px solid #F0F0F0;
+            margin-bottom: 15px;
+        }
+        
+        .read-time svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .read-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            background-color: transparent;
+            border: 2px solid #E8E0EC;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #8B4557;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .read-btn:hover {
+            background-color: #8B4557;
+            border-color: #8B4557;
+            color: white;
+        }
+        
+        .read-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        /* Modal for Article Reading */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .article-modal {
+            background-color: var(--card);
+            border-radius: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalIn 0.3s ease;
+        }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-header {
+            padding: 30px 35px 20px;
+            border-bottom: 1px solid #F0F0F0;
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+        
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: #8B4557;
+            margin-bottom: 10px;
+            padding-right: 40px;
+        }
+        
+        .modal-header .meta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .modal-header .meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .modal-body {
+            padding: 30px 35px 40px;
+        }
+        
+        .modal-body p {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+        
+        .modal-body h4 {
+            font-size: 1.1rem;
+            color: #8B4557;
+            margin: 25px 0 15px;
+        }
+        
+        .modal-body ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-body li {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .article-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .article-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-header, .modal-body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-decoration">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+</div>
+
+<nav class="navbar">
+    <div class="navbar-content">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 35 C8 25 3 15 10 8 C15 3 20 6 20 12 C20 6 25 3 30 8 C37 15 32 25 20 35 Z" fill="#6B1F2B"/>
+                    <path d="M20 35 L20 38" stroke="#6B1F2B" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M20 37 C16 34 14 30 16 27" fill="#6B1F2B"/>
+                    <path d="M20 37 C24 34 26 30 24 27" fill="#6B1F2B"/>
+                </svg>
+            </div>
+            <span class="logo-text">Mentra</span>
+        </div>
+        
+        <ul class="nav-items">
+            <li><a th:href="@{/student/dashboard}" class="nav-item">Home</a></li>
+            <li><a th:href="@{/learning}" class="nav-item active">Awareness</a></li>
+            <li><a th:href="@{/screening}" class="nav-item">Screening</a></li>
+            <li><a th:href="@{/breathing}" class="nav-item">Breathing</a></li>
+            <li><a th:href="@{/appointments}" class="nav-item">Counseling</a></li>
+            <li><a th:href="@{/chatbot}" class="nav-item">Chat bot</a></li>
+            <li><a th:href="@{/settings}" class="nav-item">Profile</a></li>
+            <li><a th:href="@{/referral}" class="nav-item">Help</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="main-content">
+    
+    
+    <section class="page-header">
+        <h1>Awareness Resources</h1>
+        <p>Explore mental health topics and test your knowledge with quizzes</p>
+    </section>
+    
+    
+    <section class="article-grid">
+        
+        
+        <div class="article-card" onclick="openArticle('anxiety')">
+            <div class="article-image">
+                <div class="placeholder bg-anxiety">🤝</div>
+                <span class="category-tag tag-anxiety">Anxiety</span>
+            </div>
+            <div class="article-content">
+                <h3>Understanding Anxiety</h3>
+                <p>Learn about anxiety symptoms, causes, and coping strategies.</p>
+                <div class="read-time">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    5 min read
+                </div>
+                <button class="read-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Read Article
+                </button>
+            </div>
+        </div>
+        
+        
+        <div class="article-card" onclick="openArticle('depression')">
+            <div class="article-image">
+                <div class="placeholder bg-depression">🌅</div>
+                <span class="category-tag tag-depression">Depression</span>
+            </div>
+            <div class="article-content">
+                <h3>Depression Awareness</h3>
+                <p>Recognize the signs of depression and when to seek help.</p>
+                <div class="read-time">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    7 min read
+                </div>
+                <button class="read-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Read Article
+                </button>
+            </div>
+        </div>
+        
+        
+        <div class="article-card" onclick="openArticle('stress')">
+            <div class="article-image">
+                <div class="placeholder bg-stress">🧘</div>
+                <span class="category-tag tag-stress">Stress</span>
+            </div>
+            <div class="article-content">
+                <h3>Stress Management</h3>
+                <p>Practical techniques to manage daily stress effectively.</p>
+                <div class="read-time">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    6 min read
+                </div>
+                <button class="read-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Read Article
+                </button>
+            </div>
+        </div>
+        
+        
+        <div class="article-card" onclick="openArticle('mindfulness')">
+            <div class="article-image">
+                <div class="placeholder bg-mindfulness">🧠</div>
+                <span class="category-tag tag-mindfulness">Mindfulness</span>
+            </div>
+            <div class="article-content">
+                <h3>Mindfulness & Meditation</h3>
+                <p>Introduction to mindfulness practices for mental wellness.</p>
+                <div class="read-time">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    8 min read
+                </div>
+                <button class="read-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Read Article
+                </button>
+            </div>
+        </div>
+        
+        
+        <div class="article-card" onclick="openArticle('selfcare')">
+            <div class="article-image">
+                <div class="placeholder bg-selfcare">💚</div>
+                <span class="category-tag tag-selfcare">Self-Care</span>
+            </div>
+            <div class="article-content">
+                <h3>Self-Care Essentials</h3>
+                <p>Building healthy habits for your mental and emotional well-being.</p>
+                <div class="read-time">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    5 min read
+                </div>
+                <button class="read-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Read Article
+                </button>
+            </div>
+        </div>
+        
+    </section>
+    
+</main>
+
+<div class="modal-overlay" id="articleModal">
+    <div class="article-modal">
+        <div class="modal-header">
+            <button class="modal-close" onclick="closeArticle()">&times;</button>
+            <h2 id="modalTitle">Article Title</h2>
+            <div class="meta">
+                <span id="modalCategory">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    Category
+                </span>
+                <span id="modalReadTime">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    5 min read
+                </span>
+            </div>
+        </div>
+        <div class="modal-body" id="modalBody">
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    // Article content data
+    const articles = {
+        anxiety: {
+            title: "Understanding Anxiety",
+            category: "Anxiety",
+            readTime: "5 min read",
+            content: `
+                <p>Anxiety is a natural response to stress, but when it becomes overwhelming or persistent, it can significantly impact your daily life. Understanding anxiety is the first step toward managing it effectively.</p>
+                
+                <h4>What is Anxiety?</h4>
+                <p>Anxiety is your body's natural response to perceived threats or stressful situations. It's the feeling of fear, worry, or unease about what's to come. While occasional anxiety is normal, anxiety disorders involve more than temporary worry or fear.</p>
+                
+                <h4>Common Symptoms of Anxiety</h4>
+                <ul>
+                    <li>Feeling nervous, restless, or tense</li>
+                    <li>Having a sense of impending danger or panic</li>
+                    <li>Increased heart rate</li>
+                    <li>Rapid breathing (hyperventilation)</li>
+                    <li>Sweating and trembling</li>
+                    <li>Difficulty concentrating or sleeping</li>
+                </ul>
+                
+                <h4>Coping Strategies</h4>
+                <p>There are several effective ways to manage anxiety:</p>
+                <ul>
+                    <li><strong>Deep breathing:</strong> Practice slow, deep breaths to calm your nervous system</li>
+                    <li><strong>Grounding techniques:</strong> Use the 5-4-3-2-1 method to stay present</li>
+                    <li><strong>Regular exercise:</strong> Physical activity releases endorphins and reduces stress</li>
+                    <li><strong>Limit caffeine:</strong> Caffeine can worsen anxiety symptoms</li>
+                    <li><strong>Talk to someone:</strong> Share your feelings with a trusted friend or counselor</li>
+                </ul>
+                
+                <p>Remember, seeking help is a sign of strength, not weakness. If anxiety is affecting your daily life, consider reaching out to a mental health professional.</p>
+            `
+        },
+        depression: {
+            title: "Depression Awareness",
+            category: "Depression",
+            readTime: "7 min read",
+            content: `
+                <p>Depression is more than just feeling sad or going through a rough patch. It's a serious mental health condition that requires understanding and treatment.</p>
+                
+                <h4>Understanding Depression</h4>
+                <p>Depression affects how you feel, think, and handle daily activities. It's one of the most common mental disorders, and importantly, it's treatable. Depression can happen to anyone regardless of age, gender, or background.</p>
+                
+                <h4>Signs and Symptoms</h4>
+                <ul>
+                    <li>Persistent sad, anxious, or "empty" mood</li>
+                    <li>Loss of interest in activities you once enjoyed</li>
+                    <li>Changes in appetite and weight</li>
+                    <li>Sleep disturbances (insomnia or oversleeping)</li>
+                    <li>Fatigue and decreased energy</li>
+                    <li>Feelings of worthlessness or guilt</li>
+                    <li>Difficulty thinking, concentrating, or making decisions</li>
+                </ul>
+                
+                <h4>When to Seek Help</h4>
+                <p>You should consider seeking professional help if:</p>
+                <ul>
+                    <li>Symptoms persist for more than two weeks</li>
+                    <li>Daily activities become difficult to manage</li>
+                    <li>You have thoughts of self-harm or suicide</li>
+                    <li>Relationships and work are being affected</li>
+                </ul>
+                
+                <h4>Treatment Options</h4>
+                <p>Depression is highly treatable through various approaches including therapy, medication, lifestyle changes, and support groups. The first step is reaching out to a healthcare provider or counselor.</p>
+                
+                <p><strong>Remember:</strong> You are not alone, and help is available. Recovery is possible.</p>
+            `
+        },
+        stress: {
+            title: "Stress Management",
+            category: "Stress",
+            readTime: "6 min read",
+            content: `
+                <p>Stress is a natural part of life, but chronic stress can take a serious toll on your physical and mental health. Learning to manage stress effectively is essential for overall well-being.</p>
+                
+                <h4>Understanding Stress</h4>
+                <p>Stress is your body's response to demands or challenges. Short-term stress can be beneficial, helping you stay alert and focused. However, prolonged stress can lead to burnout, health problems, and decreased quality of life.</p>
+                
+                <h4>Common Sources of Stress</h4>
+                <ul>
+                    <li>Academic pressure and deadlines</li>
+                    <li>Work responsibilities</li>
+                    <li>Relationship challenges</li>
+                    <li>Financial concerns</li>
+                    <li>Major life changes</li>
+                    <li>Health issues</li>
+                </ul>
+                
+                <h4>Effective Stress Management Techniques</h4>
+                <ul>
+                    <li><strong>Time management:</strong> Prioritize tasks and break them into smaller steps</li>
+                    <li><strong>Physical activity:</strong> Regular exercise is one of the best stress relievers</li>
+                    <li><strong>Relaxation techniques:</strong> Try deep breathing, meditation, or yoga</li>
+                    <li><strong>Healthy boundaries:</strong> Learn to say no when necessary</li>
+                    <li><strong>Social support:</strong> Connect with friends and family</li>
+                    <li><strong>Adequate sleep:</strong> Aim for 7-9 hours of quality sleep</li>
+                </ul>
+                
+                <h4>Quick Stress Relief Tips</h4>
+                <p>When you're feeling overwhelmed, try these quick techniques:</p>
+                <ul>
+                    <li>Take 5 slow, deep breaths</li>
+                    <li>Go for a short walk</li>
+                    <li>Listen to calming music</li>
+                    <li>Practice progressive muscle relaxation</li>
+                    <li>Write down your thoughts in a journal</li>
+                </ul>
+            `
+        },
+        mindfulness: {
+            title: "Mindfulness & Meditation",
+            category: "Mindfulness",
+            readTime: "8 min read",
+            content: `
+                <p>Mindfulness is the practice of being fully present and engaged in the current moment. It's a powerful tool for reducing stress, improving focus, and enhancing overall mental wellness.</p>
+                
+                <h4>What is Mindfulness?</h4>
+                <p>Mindfulness means paying attention to the present moment without judgment. It involves being aware of your thoughts, feelings, bodily sensations, and surrounding environment with openness and curiosity.</p>
+                
+                <h4>Benefits of Mindfulness</h4>
+                <ul>
+                    <li>Reduced stress and anxiety</li>
+                    <li>Improved focus and concentration</li>
+                    <li>Better emotional regulation</li>
+                    <li>Enhanced self-awareness</li>
+                    <li>Improved sleep quality</li>
+                    <li>Greater sense of calm and peace</li>
+                </ul>
+                
+                <h4>Simple Mindfulness Exercises</h4>
+                <p><strong>1. Mindful Breathing (2-3 minutes)</strong></p>
+                <p>Focus on your breath. Notice the sensation of air entering and leaving your body. When your mind wanders, gently bring it back to your breath.</p>
+                
+                <p><strong>2. Body Scan (5-10 minutes)</strong></p>
+                <p>Slowly move your attention through different parts of your body, noticing any sensations without trying to change them.</p>
+                
+                <p><strong>3. Mindful Observation (2-3 minutes)</strong></p>
+                <p>Choose an object and focus all your attention on it. Notice its colors, shapes, textures, and any other details.</p>
+                
+                <h4>Getting Started with Meditation</h4>
+                <ul>
+                    <li>Start with just 5 minutes a day</li>
+                    <li>Find a quiet, comfortable space</li>
+                    <li>Be patient with yourself - it's called practice for a reason</li>
+                    <li>Use guided meditation apps if helpful</li>
+                    <li>Make it a daily habit</li>
+                </ul>
+            `
+        },
+        selfcare: {
+            title: "Self-Care Essentials",
+            category: "Self-Care",
+            readTime: "5 min read",
+            content: `
+                <p>Self-care isn't selfish—it's essential. Taking care of your mental, emotional, and physical health helps you be the best version of yourself.</p>
+                
+                <h4>What is Self-Care?</h4>
+                <p>Self-care refers to activities and practices that we engage in regularly to reduce stress, maintain and enhance our health and well-being. It's about making intentional choices to care for yourself.</p>
+                
+                <h4>Types of Self-Care</h4>
+                <p><strong>Physical Self-Care:</strong></p>
+                <ul>
+                    <li>Getting enough sleep (7-9 hours)</li>
+                    <li>Eating nutritious meals</li>
+                    <li>Regular physical activity</li>
+                    <li>Staying hydrated</li>
+                </ul>
+                
+                <p><strong>Emotional Self-Care:</strong></p>
+                <ul>
+                    <li>Journaling your thoughts and feelings</li>
+                    <li>Practicing self-compassion</li>
+                    <li>Setting healthy boundaries</li>
+                    <li>Expressing your emotions in healthy ways</li>
+                </ul>
+                
+                <p><strong>Social Self-Care:</strong></p>
+                <ul>
+                    <li>Spending time with supportive people</li>
+                    <li>Asking for help when needed</li>
+                    <li>Maintaining healthy relationships</li>
+                    <li>Limiting time with negative influences</li>
+                </ul>
+                
+                <p><strong>Mental Self-Care:</strong></p>
+                <ul>
+                    <li>Taking breaks from work and screens</li>
+                    <li>Learning something new</li>
+                    <li>Engaging in hobbies you enjoy</li>
+                    <li>Practicing mindfulness or meditation</li>
+                </ul>
+                
+                <h4>Building a Self-Care Routine</h4>
+                <p>Start small. Choose one or two self-care activities and make them a regular part of your routine. Remember, consistency is more important than perfection.</p>
+            `
+        }
+    };
+    
+    function openArticle(articleId) {
+        const article = articles[articleId];
+        if (article) {
+            document.getElementById('modalTitle').textContent = article.title;
+            document.getElementById('modalCategory').innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                ${article.category}
+            `;
+            document.getElementById('modalReadTime').innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                ${article.readTime}
+            `;
+            document.getElementById('modalBody').innerHTML = article.content;
+            document.getElementById('articleModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    function closeArticle() {
+        document.getElementById('articleModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('articleModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeArticle();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeArticle();
+            closeEmergencyModal();
+        }
+    });
+    
+    // Emergency Modal Functions
+    function openEmergencyModal() {
+        document.getElementById('emergencyModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeEmergencyModal() {
+        document.getElementById('emergencyModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    document.getElementById('emergencyModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEmergencyModal();
+        }
+    });
+</script>
+
+<!-- Emergency SOS Button -->
+<button class="emergency-fab" onclick="openEmergencyModal()" aria-label="Emergency Help">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+    SOS
+</button>
+
+<!-- Emergency Modal -->
+<div class="emergency-modal" id="emergencyModal">
+    <div class="emergency-modal-content">
+        <button class="emergency-close" onclick="closeEmergencyModal()">&times;</button>
+        <h2>🆘 Need Immediate Help?</h2>
+        <p>If you're in crisis or need immediate support, please reach out:</p>
+        
+        <div class="emergency-contacts">
+            <div class="emergency-contact-card">
+                <div class="contact-icon">📞</div>
+                <h3>Befrienders Malaysia</h3>
+                <p>24-hour crisis support</p>
+                <a href="tel:+60379568145" class="emergency-call-btn">+603-7956 8145</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">💬</div>
+                <h3>Talian Kasih</h3>
+                <p>Social welfare helpline</p>
+                <a href="tel:15999" class="emergency-call-btn">15999</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">🏥</div>
+                <h3>Campus Counseling</h3>
+                <p>University support services</p>
+                <a th:href="@{/appointments}" class="emergency-book-btn">Book Now</a>
+            </div>
+        </div>
+        
+        <p class="emergency-note">Remember: You are not alone. Help is always available.</p>
+    </div>
+</div>
+
+</body>
+</html>

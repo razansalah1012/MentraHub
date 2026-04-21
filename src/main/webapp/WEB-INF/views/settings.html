@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Mentra</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script th:inline="javascript">window.contextPath = /*[[@{/}]]*/ '/mentraApp/';</script>
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #EDEEFF 0%, #E8E0F0 100%);
+            min-height: 100vh;
+        }
+        
+        /* Navigation */
+        .navbar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px 40px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: #8B4557;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-links a {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            background: #6C74D8;
+            color: white;
+        }
+        
+        .nav-links a.active {
+            background: #6C74D8;
+            color: white;
+        }
+        
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 40px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+        
+        /* Left Column - Profile & Stats */
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #8B4557 0%, #6C74D8 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .profile-avatar svg {
+            width: 50px;
+            height: 50px;
+            color: white;
+        }
+        
+        .profile-name {
+            font-size: 1.5rem;
+            color: #8B4557;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .profile-email {
+            color: #6C74D8;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+        
+        .logout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 35px;
+            border: 2px solid #ddd;
+            background: transparent;
+            border-radius: 25px;
+            cursor: pointer;
+            color: #666;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .logout-btn:hover {
+            border-color: #8B4557;
+            color: #8B4557;
+        }
+        
+        .logout-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* Stats Card */
+        .stats-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        .stats-title {
+            font-size: 1.1rem;
+            color: #8B4557;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: #555;
+            font-size: 0.95rem;
+        }
+        
+        .stat-value {
+            color: #6C74D8;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        /* Right Column */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        /* Badges Section */
+        .badges-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        .badges-header {
+            margin-bottom: 10px;
+        }
+        
+        .badges-title {
+            color: #8B4557;
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-style: italic;
+        }
+        
+        .badges-subtitle {
+            color: #8B4557;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+        
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .badge-card {
+            border: 2px solid #e8e8e8;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .badge-card.earned {
+            border-color: #6C74D8;
+            background: linear-gradient(135deg, rgba(108, 116, 216, 0.03) 0%, rgba(139, 69, 87, 0.03) 100%);
+        }
+        
+        .badge-card.locked {
+            opacity: 0.6;
+        }
+        
+        .badge-icon {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+        
+        .badge-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .badge-icon.cyan svg {
+            color: #40E0D0;
+        }
+        
+        .badge-icon.orange svg {
+            color: #FFB347;
+        }
+        
+        .badge-icon.gray svg {
+            color: #aaa;
+        }
+        
+        .badge-info {
+            flex: 1;
+        }
+        
+        .badge-name-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .badge-name {
+            color: #8B4557;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .badge-tag {
+            background: #FFE4E9;
+            color: #8B4557;
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .badge-desc {
+            color: #777;
+            font-size: 0.85rem;
+        }
+        
+        /* Settings Section */
+        .settings-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .settings-header svg {
+            width: 24px;
+            height: 24px;
+            color: #8B4557;
+        }
+        
+        .settings-title {
+            color: #8B4557;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .settings-subtitle {
+            color: #8B4557;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+        
+        .settings-group {
+            margin-bottom: 30px;
+        }
+        
+        .settings-group-title {
+            color: #8B4557;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #8B4557;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            background: #E8FFE8;
+            font-size: 1rem;
+            color: #555;
+        }
+        
+        .form-group input:disabled {
+            background: #f5f5f5;
+            color: #888;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 116, 216, 0.2);
+        }
+        
+        /* Accessibility Settings */
+        .accessibility-group {
+            border-top: 1px solid #eee;
+            padding-top: 25px;
+            margin-top: 25px;
+        }
+        
+        .accessibility-title {
+            color: #8B4557;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+        
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-info h4 {
+            color: #8B4557;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .toggle-info p {
+            color: #888;
+            font-size: 0.85rem;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 55px;
+            height: 28px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #8B4557;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(27px);
+        }
+        
+        /* Language Group */
+        .language-group {
+            border-top: 1px solid #eee;
+            padding-top: 25px;
+            margin-top: 25px;
+        }
+        
+        .language-title {
+            color: #8B4557;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        
+        /* Save Button */
+        .save-btn {
+            width: 100%;
+            padding: 16px;
+            background: #8B4557;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .save-btn:hover {
+            background: #7a3d4c;
+            transform: translateY(-2px);
+        }
+        
+        /* Decorative Elements */
+        .decoration {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #6C74D8 0%, #8B4557 100%);
+            border-radius: 50% 0 0 0;
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .badges-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="#FFE4E9"/>
+                    <path d="M50 25C40 25 32 33 32 43C32 58 50 75 50 75C50 75 68 58 68 43C68 33 60 25 50 25Z" fill="#8B4557"/>
+                    <path d="M50 80L50 90M40 85C40 85 45 88 50 88C55 88 60 85 60 85" stroke="#8B4557" stroke-width="3" stroke-linecap="round"/>
+                    <ellipse cx="50" cy="40" rx="8" ry="10" fill="#FFE4E9"/>
+                </svg>
+                <span class="logo-text">Mentra</span>
+            </div>
+            <div class="nav-links">
+                <a th:href="@{/student/dashboard}">Home</a>
+                <a th:href="@{/learning}">Awareness</a>
+                <a th:href="@{/screening}">Screening</a>
+                <a th:href="@{/breathing}">Breathing</a>
+                <a th:href="@{/appointments}">Counseling</a>
+                <a th:href="@{/chatbot}">Chat bot</a>
+                <a th:href="@{/settings}" class="active">Profile</a>
+                <a th:href="@{/referral}">Help</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        
+        <div class="left-column">
+            
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                </div>
+                <h2 class="profile-name" th:text="${user.fullName}">User Name</h2>
+                <p class="profile-email" th:text="${user.email}">user@email.com</p>
+                <a th:href="@{/auth/logout}" class="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Logout
+                </a>
+            </div>
+            
+            
+            <div class="stats-card">
+                <h3 class="stats-title">Your Stats</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Screenings</span>
+                    <span class="stat-value" th:text="${screeningsCount}">3</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Quizzes Completed</span>
+                    <span class="stat-value" th:text="${quizzesCount}">5</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Chat Sessions</span>
+                    <span class="stat-value" th:text="${chatSessionsCount}">12</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Days Active</span>
+                    <span class="stat-value" th:text="${daysActive}">15</span>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="right-column">
+            
+            <div class="badges-section">
+                <div class="badges-header">
+                    <h2 class="badges-title">Badges & Achievements</h2>
+                    <p class="badges-subtitle">Track your mental wellness journey</p>
+                </div>
+                <div class="badges-grid">
+                    <div class="badge-card earned">
+                        <div class="badge-icon cyan">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <div class="badge-info">
+                            <div class="badge-name-row">
+                                <span class="badge-name">First Steps</span>
+                                <span class="badge-tag">Earned</span>
+                            </div>
+                            <p class="badge-desc">Completed your first screening</p>
+                        </div>
+                    </div>
+                    
+                    <div class="badge-card earned">
+                        <div class="badge-icon orange">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </div>
+                        <div class="badge-info">
+                            <div class="badge-name-row">
+                                <span class="badge-name">Knowledge Seeker</span>
+                                <span class="badge-tag">Earned</span>
+                            </div>
+                            <p class="badge-desc">Completed 3 awareness quizzes</p>
+                        </div>
+                    </div>
+                    
+                    <div class="badge-card locked">
+                        <div class="badge-icon gray">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            </svg>
+                        </div>
+                        <div class="badge-info">
+                            <div class="badge-name-row">
+                                <span class="badge-name">Consistent Learner</span>
+                            </div>
+                            <p class="badge-desc">Active for 7 consecutive days</p>
+                        </div>
+                    </div>
+                    
+                    <div class="badge-card locked">
+                        <div class="badge-icon gray">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                            </svg>
+                        </div>
+                        <div class="badge-info">
+                            <div class="badge-name-row">
+                                <span class="badge-name">Wellness Champion</span>
+                            </div>
+                            <p class="badge-desc">Completed all awareness modules</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="settings-section">
+                <div class="settings-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <h2 class="settings-title">Settings</h2>
+                </div>
+                <p class="settings-subtitle">Customize your experience</p>
+                
+                
+                <div class="settings-group">
+                    <h3 class="settings-group-title">Profile Information</h3>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" th:value="${user.fullName}" id="fullName">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" th:value="${user.email}" disabled>
+                    </div>
+                </div>
+                
+                
+                <div class="accessibility-group">
+                    <h3 class="accessibility-title">Accessibility</h3>
+                    
+                    <div class="toggle-row">
+                        <div class="toggle-info">
+                            <h4>Dark Mode</h4>
+                            <p>Reduce eye strain in low light</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="darkMode" th:checked="${user.darkMode}">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Font Size</label>
+                        <select id="fontSize">
+                            <option value="small" th:selected="${user.fontSize == 'small'}">Small</option>
+                            <option value="medium" th:selected="${user.fontSize == 'medium' or user.fontSize == null}">Medium</option>
+                            <option value="large" th:selected="${user.fontSize == 'large'}">Large</option>
+                        </select>
+                    </div>
+                </div>
+                
+                
+                <div class="language-group">
+                    <h3 class="language-title">Language</h3>
+                    <div class="form-group">
+                        <label>Preferred Language</label>
+                        <select id="language">
+                            <option value="en" th:selected="${user.language == 'en' or user.language == null}">English</option>
+                            <option value="ms" th:selected="${user.language == 'ms'}">Bahasa Malaysia</option>
+                            <option value="zh" th:selected="${user.language == 'zh'}">中文</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="save-btn" onclick="saveSettings()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="decoration"></div>
+    
+    <script>
+        function toggleDarkMode(enabled) {
+            if (enabled) {
+                document.body.classList.add('dark-mode');
+                sessionStorage.setItem('darkMode', 'true');
+            } else {
+                document.body.classList.remove('dark-mode');
+                sessionStorage.setItem('darkMode', 'false');
+            }
+        }
+        
+        function saveSettings() {
+            var fullName = document.getElementById('fullName').value;
+            var darkMode = document.getElementById('darkMode').checked;
+            var fontSize = document.getElementById('fontSize').value;
+            var language = document.getElementById('language').value;
+            
+            var saveBtn = document.querySelector('.save-btn');
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+            
+            var params = new URLSearchParams();
+            params.append('fullName', fullName);
+            params.append('darkMode', darkMode);
+            params.append('fontSize', fontSize);
+            params.append('language', language);
+            
+            fetch(window.contextPath + 'settings/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params.toString()
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                saveBtn.textContent = 'Save Changes';
+                saveBtn.disabled = false;
+                
+                if (data.success) {
+                    showNotification('Settings saved successfully!', 'success');
+                } else {
+                    showNotification(data.message || 'Error saving settings', 'error');
+                }
+            })
+            .catch(function(error) {
+                saveBtn.textContent = 'Save Changes';
+                saveBtn.disabled = false;
+                showNotification('Error saving settings', 'error');
+            });
+        }
+        
+        function showNotification(message, type) {
+            var existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+            
+            var notification = document.createElement('div');
+            notification.className = 'notification ' + type;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(function() {
+                notification.classList.add('fade-out');
+                setTimeout(function() { notification.remove(); }, 300);
+            }, 3000);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            var darkModeCheckbox = document.getElementById('darkMode');
+            var fontSizeSelect = document.getElementById('fontSize');
+            
+            if (darkModeCheckbox.checked) {
+                toggleDarkMode(true);
+            }
+            
+            darkModeCheckbox.addEventListener('change', function() {
+                toggleDarkMode(this.checked);
+            });
+            
+            fontSizeSelect.addEventListener('change', function() {
+                document.body.classList.remove('font-small', 'font-medium', 'font-large');
+                document.body.classList.add('font-' + this.value);
+                sessionStorage.setItem('fontSize', this.value);
+            });
+        });
+    </script>
+    
+    <style>
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success {
+            background: #4CAF50;
+        }
+        
+        .notification.error {
+            background: #f44336;
+        }
+        
+        .notification.fade-out {
+            animation: fadeOut 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+        }
+        
+        body.dark-mode .navbar,
+        body.dark-mode .profile-card,
+        body.dark-mode .stats-card,
+        body.dark-mode .badges-section,
+        body.dark-mode .settings-section {
+            background: #16213e !important;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .nav-links a {
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .nav-links a:hover,
+        body.dark-mode .nav-links a.active {
+            background: #6C74D8;
+            color: white;
+        }
+        
+        body.dark-mode .logo-text {
+            color: #a0a8f8;
+        }
+        
+        body.dark-mode .profile-name,
+        body.dark-mode .profile-email,
+        body.dark-mode .stats-title,
+        body.dark-mode .badges-title,
+        body.dark-mode .settings-title,
+        body.dark-mode .settings-group-title,
+        body.dark-mode .accessibility-title,
+        body.dark-mode .language-title,
+        body.dark-mode h3,
+        body.dark-mode h4,
+        body.dark-mode label {
+            color: #e0e0e0 !important;
+        }
+        
+        body.dark-mode .stat-value {
+            color: #a0a8f8;
+        }
+        
+        body.dark-mode input,
+        body.dark-mode select {
+            background: #1a1a2e !important;
+            color: #e0e0e0 !important;
+            border-color: #3a3a5a !important;
+        }
+        
+        body.dark-mode .badge-card {
+            background: #1a1a2e !important;
+            border-color: #3a3a5a;
+        }
+        
+        body.dark-mode .badge-card.locked {
+            background: #0f0f23 !important;
+        }
+        
+        body.dark-mode .badge-name,
+        body.dark-mode .badge-tag {
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .stat-label,
+        body.dark-mode .stat-item,
+        body.dark-mode .badge-desc,
+        body.dark-mode .badges-subtitle,
+        body.dark-mode .settings-subtitle,
+        body.dark-mode .toggle-info p {
+            color: #aaa !important;
+        }
+        
+        body.dark-mode .toggle-info h4 {
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .stat-item {
+            border-color: #3a3a5a;
+        }
+        
+        body.dark-mode .logout-btn {
+            color: #e0e0e0;
+            border-color: #3a3a5a;
+        }
+        
+        body.dark-mode .logout-btn:hover {
+            color: #a0a8f8;
+            border-color: #a0a8f8;
+        }
+        
+        body.dark-mode .save-btn {
+            background: #6C74D8;
+        }
+        
+        body.dark-mode .form-group label {
+            color: #b0b0b0;
+        }
+        
+        body.dark-mode .decoration {
+            opacity: 0.1;
+        }
+        
+        body.font-small {
+            font-size: 14px;
+        }
+        
+        body.font-medium {
+            font-size: 16px;
+        }
+        
+        body.font-large {
+            font-size: 18px;
+        }
+    </style>
+
+<!-- Emergency SOS Button -->
+<button class="emergency-fab" onclick="openEmergencyModal()" aria-label="Emergency Help">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+    SOS
+</button>
+
+<!-- Emergency Modal -->
+<div class="emergency-modal" id="emergencyModal">
+    <div class="emergency-modal-content">
+        <button class="emergency-close" onclick="closeEmergencyModal()">&times;</button>
+        <h2>🆘 Need Immediate Help?</h2>
+        <p>If you're in crisis or need immediate support, please reach out:</p>
+        
+        <div class="emergency-contacts">
+            <div class="emergency-contact-card">
+                <div class="contact-icon">📞</div>
+                <h3>Befrienders Malaysia</h3>
+                <p>24-hour crisis support</p>
+                <a href="tel:+60379568145" class="emergency-call-btn">+603-7956 8145</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">💬</div>
+                <h3>Talian Kasih</h3>
+                <p>Social welfare helpline</p>
+                <a href="tel:15999" class="emergency-call-btn">15999</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">🏥</div>
+                <h3>Campus Counseling</h3>
+                <p>University support services</p>
+                <a th:href="@{/appointments}" class="emergency-book-btn">Book Now</a>
+            </div>
+        </div>
+        
+        <p class="emergency-note">Remember: You are not alone. Help is always available.</p>
+    </div>
+</div>
+
+<script>
+    function openEmergencyModal() {
+        document.getElementById('emergencyModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeEmergencyModal() {
+        document.getElementById('emergencyModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    document.getElementById('emergencyModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEmergencyModal();
+        }
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeEmergencyModal();
+        }
+    });
+</script>
+
+</body>
+</html>

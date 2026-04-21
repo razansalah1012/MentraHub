@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentraHub | Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script th:inline="javascript">window.contextPath = /*[[@{/}]]*/ '/mentraApp/';</script>
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+
+<div class="bg-decoration">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+</div>
+
+<nav class="navbar">
+    <div class="navbar-content">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 35 C8 25 3 15 10 8 C15 3 20 6 20 12 C20 6 25 3 30 8 C37 15 32 25 20 35 Z" fill="#6B1F2B"/>
+                    <path d="M20 35 L20 38" stroke="#6B1F2B" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M20 37 C16 34 14 30 16 27" fill="#6B1F2B"/>
+                    <path d="M20 37 C24 34 26 30 24 27" fill="#6B1F2B"/>
+                </svg>
+            </div>
+            <span class="logo-text">Mentra</span>
+        </div>
+        
+        <ul class="nav-items">
+            <li><a th:href="@{/student/dashboard}" class="nav-item active">Home</a></li>
+            <li><a th:href="@{/learning}" class="nav-item">Awareness</a></li>
+            <li><a th:href="@{/screening}" class="nav-item">Screening</a></li>
+            <li><a th:href="@{/breathing}" class="nav-item">Breathing</a></li>
+            <li><a th:href="@{/appointments}" class="nav-item">Counseling</a></li>
+            <li><a th:href="@{/chatbot}" class="nav-item">Chat bot</a></li>
+            <li><a th:href="@{/settings}" class="nav-item">Profile</a></li>
+            <li><a th:href="@{/referral}" class="nav-item">Help</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="main-content">
+    
+    
+    <section class="welcome-section">
+        <h2>Hi!</h2>
+        <p>Welcome back to your mental wellness journey</p>
+    </section>
+    
+    
+    <section class="feature-grid">
+        
+        
+        <div class="feature-card">
+            <div class="feature-header">
+                <div class="feature-info">
+                    <h3>Awareness Resources</h3>
+                    <p>Learn about mental health topics</p>
+                </div>
+                <div class="feature-icon icon-teal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                </div>
+            </div>
+            <a th:href="@{/learning}" class="feature-btn">Get Started</a>
+        </div>
+        
+        
+        <div class="feature-card">
+            <div class="feature-header">
+                <div class="feature-info">
+                    <h3>Self-Screening</h3>
+                    <p>Check your mental wellness</p>
+                </div>
+                <div class="feature-icon icon-green">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                </div>
+            </div>
+            <a th:href="@{/screening}" class="feature-btn">Get Started</a>
+        </div>
+        
+        
+        <div class="feature-card">
+            <div class="feature-header">
+                <div class="feature-info">
+                    <h3>AI Chatbot</h3>
+                    <p>Talk to our supportive chatbot</p>
+                </div>
+                <div class="feature-icon icon-orange">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                </div>
+            </div>
+            <a th:href="@{/chatbot}" class="feature-btn">Get Started</a>
+        </div>
+        
+        
+        <div class="feature-card">
+            <div class="feature-header">
+                <div class="feature-info">
+                    <h3>Request Counseling</h3>
+                    <p>Book a session with a counselor</p>
+                </div>
+                <div class="feature-icon icon-red">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+            </div>
+            <a th:href="@{/referral}" class="feature-btn">Get Started</a>
+        </div>
+        
+        
+        <div class="feature-card">
+            <div class="feature-header">
+                <div class="feature-info">
+                    <h3>Feedback</h3>
+                    <p>Share your experience</p>
+                </div>
+                <div class="feature-icon icon-purple">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                </div>
+            </div>
+            <a th:href="@{/referral(action='feedback')}" class="feature-btn">Get Started</a>
+        </div>
+        
+        
+        <div class="feature-card">
+            <div class="feature-header">
+                <div class="feature-info">
+                    <h3>Progress & Badges</h3>
+                    <p>View your achievements</p>
+                </div>
+                <div class="feature-icon icon-mint">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                </div>
+            </div>
+            <a th:href="@{/settings}" class="feature-btn">Get Started</a>
+        </div>
+        
+    </section>
+    
+    
+    <section class="recent-activity">
+        <h3>Recent Activity</h3>
+        <p>Your recent interactions</p>
+        
+        <div class="activity-item">
+            <div class="activity-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+            </div>
+            <div class="activity-info">
+                <h4>Completed DASS-21 Screening</h4>
+                <p>2 days ago</p>
+            </div>
+        </div>
+    </section>
+    
+</main>
+
+<!-- Emergency SOS Button -->
+<button class="emergency-fab" onclick="openEmergencyModal()" aria-label="Emergency Help">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+    SOS
+</button>
+
+<!-- Emergency Modal -->
+<div class="emergency-modal" id="emergencyModal">
+    <div class="emergency-modal-content">
+        <button class="emergency-close" onclick="closeEmergencyModal()">&times;</button>
+        <h2>🆘 Need Immediate Help?</h2>
+        <p>If you're in crisis or need immediate support, please reach out:</p>
+        
+        <div class="emergency-contacts">
+            <div class="emergency-contact-card">
+                <div class="contact-icon">📞</div>
+                <h3>Befrienders Malaysia</h3>
+                <p>24-hour crisis support</p>
+                <a href="tel:+60379568145" class="emergency-call-btn">+603-7956 8145</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">💬</div>
+                <h3>Talian Kasih</h3>
+                <p>Social welfare helpline</p>
+                <a href="tel:15999" class="emergency-call-btn">15999</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">🏥</div>
+                <h3>Campus Counseling</h3>
+                <p>University support services</p>
+                <a th:href="@{/appointments}" class="emergency-book-btn">Book Now</a>
+            </div>
+        </div>
+        
+        <p class="emergency-note">Remember: You are not alone. Help is always available.</p>
+    </div>
+</div>
+
+<script>
+    function openEmergencyModal() {
+        document.getElementById('emergencyModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeEmergencyModal() {
+        document.getElementById('emergencyModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Close on clicking outside
+    document.getElementById('emergencyModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEmergencyModal();
+        }
+    });
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeEmergencyModal();
+        }
+    });
+</script>
+
+</body>
+</html>
+

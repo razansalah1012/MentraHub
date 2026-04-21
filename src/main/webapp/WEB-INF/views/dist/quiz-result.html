@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentraHub | Quiz Result</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script th:inline="javascript">window.contextPath = /*[[@{/}]]*/ '/mentraApp/';</script>
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        .result-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 100px);
+            padding: 40px;
+        }
+        
+        .result-card {
+            background-color: var(--card);
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        
+        .result-card h2 {
+            font-size: 1.6rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .result-card .subtitle {
+            color: #C7A4C4;
+            margin-bottom: 30px;
+        }
+        
+        .trophy-icon {
+            width: 100px;
+            height: 100px;
+            background-color: #F5F5F5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+        }
+        
+        .trophy-icon svg {
+            width: 50px;
+            height: 50px;
+            color: #FFB300;
+        }
+        
+        .score-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .score-value {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+        }
+        
+        .achievement-box {
+            background-color: #F5F8F5;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .achievement-level {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #FFB300;
+            margin-bottom: 8px;
+        }
+        
+        .achievement-message {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        .btn-return {
+            width: 100%;
+            padding: 16px;
+            background-color: #8B4557;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .btn-return:hover {
+            background-color: #7A3A4A;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-decoration">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+</div>
+
+<nav class="navbar">
+    <div class="navbar-content">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 35 C8 25 3 15 10 8 C15 3 20 6 20 12 C20 6 25 3 30 8 C37 15 32 25 20 35 Z" fill="#6B1F2B"/>
+                    <path d="M20 35 L20 38" stroke="#6B1F2B" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M20 37 C16 34 14 30 16 27" fill="#6B1F2B"/>
+                    <path d="M20 37 C24 34 26 30 24 27" fill="#6B1F2B"/>
+                </svg>
+            </div>
+            <span class="logo-text">Mentra</span>
+        </div>
+    </div>
+</nav>
+
+<div class="result-container">
+    <div class="result-card">
+        <h2>Quiz Complete!</h2>
+        <p class="subtitle">Here's how you did</p>
+        
+        <div class="trophy-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M5 3h14v2h-1v2c0 2.21-1.79 4-4 4h-1v2h2v2h-2v4h-2v-4H9v-2h2v-2H8c-2.21 0-4-1.79-4-4V5H3V3zm2 2v2c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V5H7z"/>
+            </svg>
+        </div>
+        
+        <p class="score-text">Your Score</p>
+        <p class="score-value" th:text="${score + ' out of ' + total + ' correct'}">5 out of 5 correct</p>
+        
+        <div class="achievement-box">
+            <p class="achievement-level" th:text="${level}">Expert</p>
+            <p class="achievement-message" th:text="${message}">Excellent work! You have a great understanding of this topic.</p>
+        </div>
+        
+        <a th:href="@{/learning}" class="btn-return">Return to Awareness Resources</a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentraHub | AI Support Chatbot</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script th:inline="javascript">window.contextPath = /*[[@{/}]]*/ '/mentraApp/';</script>
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        /* Chatbot Page Styles */
+        .chat-container {
+            background-color: var(--card);
+            border-radius: 20px;
+            padding: 30px 35px;
+            max-width: 750px;
+            box-shadow: 0 4px 20px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 200px);
+            min-height: 500px;
+        }
+        
+        /* Chat Header */
+        .chat-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #F0E0E8;
+        }
+        
+        .chat-header h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 5px;
+        }
+        
+        .chat-header p {
+            font-size: 0.9rem;
+            color: #E88B8B;
+        }
+        
+        /* Messages Area */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        /* Message Bubble */
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            max-width: 85%;
+        }
+        
+        .message.bot {
+            align-self: flex-start;
+        }
+        
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .message.bot .message-avatar {
+            background-color: #E8E0EC;
+            color: #8B4557;
+        }
+        
+        .message.user .message-avatar {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .message-avatar svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .message-content {
+            padding: 14px 18px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .message.bot .message-content {
+            background-color: #F8F6FA;
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message.user .message-content {
+            background-color: var(--primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        /* Quick Replies */
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px 0;
+            border-top: 1px solid #F0E0E8;
+            margin-top: auto;
+        }
+        
+        .quick-reply-btn {
+            padding: 10px 18px;
+            background-color: transparent;
+            border: 1px solid #E8D5E0;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            color: #8B4557;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-reply-btn:hover {
+            background-color: #F8E8EE;
+            border-color: #8B4557;
+        }
+        
+        /* Input Area */
+        .input-area {
+            display: flex;
+            gap: 12px;
+            padding-top: 15px;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 14px 20px;
+            background-color: #F8F6FA;
+            border: 1px solid #E8E0EC;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .message-input:focus {
+            border-color: var(--primary);
+        }
+        
+        .message-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background-color: #7DD3C0;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .send-btn:hover {
+            background-color: #5BC0A8;
+        }
+        
+        .send-btn svg {
+            width: 20px;
+            height: 20px;
+            color: white;
+            transform: rotate(45deg);
+        }
+        
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 14px 18px;
+            background-color: #F8F6FA;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            width: fit-content;
+        }
+        
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background-color: #C0B0B8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        
+        /* Scrollbar */
+        .messages-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .messages-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .messages-area::-webkit-scrollbar-thumb {
+            background-color: #E0D0D8;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-decoration">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+</div>
+
+<nav class="navbar">
+    <div class="navbar-content">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 35 C8 25 3 15 10 8 C15 3 20 6 20 12 C20 6 25 3 30 8 C37 15 32 25 20 35 Z" fill="#6B1F2B"/>
+                    <path d="M20 35 L20 38" stroke="#6B1F2B" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M20 37 C16 34 14 30 16 27" fill="#6B1F2B"/>
+                    <path d="M20 37 C24 34 26 30 24 27" fill="#6B1F2B"/>
+                </svg>
+            </div>
+            <span class="logo-text">Mentra</span>
+        </div>
+        
+        <ul class="nav-items">
+            <li><a th:href="@{/student/dashboard}" class="nav-item">Home</a></li>
+            <li><a th:href="@{/learning}" class="nav-item">Awareness</a></li>
+            <li><a th:href="@{/screening}" class="nav-item">Screening</a></li>
+            <li><a th:href="@{/breathing}" class="nav-item">Breathing</a></li>
+            <li><a th:href="@{/appointments}" class="nav-item">Counseling</a></li>
+            <li><a th:href="@{/chatbot}" class="nav-item active">Chat bot</a></li>
+            <li><a th:href="@{/settings}" class="nav-item">Profile</a></li>
+            <li><a th:href="@{/referral}" class="nav-item">Help</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="main-content">
+    
+    <div class="chat-container">
+        
+        
+        <div class="chat-header">
+            <h2>AI Support Chatbot</h2>
+            <p>Talk to our supportive AI assistant. Remember, this is not a substitute for professional help.</p>
+        </div>
+        
+        
+        <div class="messages-area" id="messagesArea">
+            
+            <div class="message bot">
+                <div class="message-avatar">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                </div>
+                <div class="message-content">
+                    Hi! I'm here to support you. How are you feeling today?
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="quick-replies" id="quickReplies">
+            <button class="quick-reply-btn" onclick="sendQuickReply('I\'m feeling anxious')">I'm feeling anxious</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('I\'m feeling stressed')">I'm feeling stressed</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('I need help sleeping')">I need help sleeping</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('I want to talk to a counselor')">I want to talk to a counselor</button>
+        </div>
+        
+        
+        <div class="input-area">
+            <input type="text" class="message-input" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+            </button>
+        </div>
+        
+    </div>
+    
+</main>
+
+<script>
+    // Rule-based chatbot responses
+    const responses = {
+        // Anxiety
+        anxious: {
+            keywords: ['anxious', 'anxiety', 'worried', 'panic', 'nervous', 'fear', 'scared'],
+            response: "I understand you're feeling anxious. That's completely valid. Have you tried some deep breathing exercises? Taking slow, deep breaths can help calm your nervous system. Would you like me to guide you through a quick breathing exercise?"
+        },
+        // Stress
+        stressed: {
+            keywords: ['stressed', 'stress', 'overwhelmed', 'pressure', 'too much', 'exhausted', 'burnt out', 'burnout'],
+            response: "It sounds like you're dealing with a lot of stress. Remember, it's okay to take breaks. Try to identify one small thing you can do right now to feel better. Would you like some tips on managing stress?"
+        },
+        // Depression/Sadness
+        sad: {
+            keywords: ['sad', 'depressed', 'depression', 'hopeless', 'empty', 'worthless', 'alone', 'lonely'],
+            response: "I'm sorry you're feeling this way. Your feelings are valid, and it takes courage to share them. Remember, you're not alone in this. Have you considered talking to a counselor? They can provide professional support."
+        },
+        // Sleep
+        sleep: {
+            keywords: ['sleep', 'sleeping', 'insomnia', 'tired', 'can\'t sleep', 'nightmare', 'rest'],
+            response: "Sleep issues can really affect your wellbeing. Here are some tips: Try to maintain a consistent sleep schedule, avoid screens before bed, and create a calm sleeping environment. Would you like more sleep hygiene tips?"
+        },
+        // Counselor
+        counselor: {
+            keywords: ['counselor', 'therapist', 'professional', 'help', 'therapy', 'doctor'],
+            response: "That's a great step! Speaking with a professional can really help. You can visit our Help section to find counseling resources, or speak with your school counselor. Remember, seeking help is a sign of strength."
+        },
+        // Breathing exercise
+        breathing: {
+            keywords: ['breathing', 'breathe', 'exercise', 'calm', 'relax'],
+            response: "Let's do a quick breathing exercise together: 1) Breathe in slowly through your nose for 4 counts, 2) Hold for 4 counts, 3) Exhale slowly through your mouth for 6 counts. Repeat this 3-4 times. How do you feel?"
+        },
+        // Greetings
+        greeting: {
+            keywords: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'],
+            response: "Hello! I'm here to support you. How are you feeling today? You can tell me about what's on your mind, or use the quick reply buttons below."
+        },
+        // Thanks
+        thanks: {
+            keywords: ['thank', 'thanks', 'helpful', 'appreciate'],
+            response: "You're welcome! I'm always here if you need to talk. Remember, taking care of your mental health is important. Is there anything else I can help you with?"
+        },
+        // Feeling better
+        better: {
+            keywords: ['better', 'good', 'great', 'fine', 'okay', 'happy'],
+            response: "I'm glad to hear that! It's wonderful that you're feeling positive. Keep taking care of yourself. Is there anything else you'd like to talk about?"
+        },
+        // Yes responses
+        yes: {
+            keywords: ['yes', 'sure', 'okay', 'please', 'yeah', 'yep'],
+            response: "Great! Here are some helpful resources:\n\n• Try our Self-Screening tools to better understand your mental health\n• Check out Awareness Resources for helpful articles\n• Visit the Help section for professional support options\n\nRemember, you're taking positive steps by being here!"
+        },
+        // Coping strategies
+        coping: {
+            keywords: ['cope', 'coping', 'deal', 'manage', 'tips', 'advice', 'strategies'],
+            response: "Here are some healthy coping strategies:\n\n1. Practice deep breathing or meditation\n2. Exercise regularly - even a short walk helps\n3. Talk to someone you trust\n4. Write in a journal\n5. Get enough sleep\n6. Limit caffeine and alcohol\n\nWould you like to know more about any of these?"
+        }
+    };
+    
+    // Default responses when no keyword matches
+    const defaultResponses = [
+        "I hear you. It's important to express your feelings. Can you tell me more about what you're experiencing?",
+        "Thank you for sharing. Remember, your feelings are valid. Would you like to explore some coping strategies together?",
+        "I'm here to listen. Sometimes just talking about things can help. What else is on your mind?",
+        "I understand this might be difficult. Remember, you don't have to face this alone. How can I best support you right now?"
+    ];
+    
+    function findResponse(message) {
+        const lowerMessage = message.toLowerCase();
+        
+        // Check each response category for keyword matches
+        for (const category in responses) {
+            const { keywords, response } = responses[category];
+            for (const keyword of keywords) {
+                if (lowerMessage.includes(keyword)) {
+                    return response;
+                }
+            }
+        }
+        
+        // Return random default response
+        return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+    }
+    
+    function addMessage(text, isUser) {
+        const messagesArea = document.getElementById('messagesArea');
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+        
+        const avatarIcon = isUser 
+            ? '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>'
+            : '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>';
+        
+        messageDiv.innerHTML = `
+            <div class="message-avatar">${avatarIcon}</div>
+            <div class="message-content">${text.replace(/\n/g, '<br>')}</div>
+        `;
+        
+        messagesArea.appendChild(messageDiv);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+    
+    function showTypingIndicator() {
+        const messagesArea = document.getElementById('messagesArea');
+        
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerHTML = `
+            <div class="message-avatar">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+            </div>
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        `;
+        
+        messagesArea.appendChild(typingDiv);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+    
+    function hideTypingIndicator() {
+        const typing = document.getElementById('typingIndicator');
+        if (typing) {
+            typing.remove();
+        }
+    }
+    
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        // Add user message
+        addMessage(message, true);
+        input.value = '';
+        
+        // Show typing indicator
+        showTypingIndicator();
+        
+        // Simulate bot thinking time
+        setTimeout(() => {
+            hideTypingIndicator();
+            const response = findResponse(message);
+            addMessage(response, false);
+        }, 1000 + Math.random() * 500);
+    }
+    
+    function sendQuickReply(message) {
+        document.getElementById('messageInput').value = message;
+        sendMessage();
+    }
+    
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+    
+    // Emergency Modal Functions
+    function openEmergencyModal() {
+        document.getElementById('emergencyModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeEmergencyModal() {
+        document.getElementById('emergencyModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    document.getElementById('emergencyModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEmergencyModal();
+        }
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeEmergencyModal();
+        }
+    });
+</script>
+
+<!-- Emergency SOS Button -->
+<button class="emergency-fab" onclick="openEmergencyModal()" aria-label="Emergency Help">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+    SOS
+</button>
+
+<!-- Emergency Modal -->
+<div class="emergency-modal" id="emergencyModal">
+    <div class="emergency-modal-content">
+        <button class="emergency-close" onclick="closeEmergencyModal()">&times;</button>
+        <h2>🆘 Need Immediate Help?</h2>
+        <p>If you're in crisis or need immediate support, please reach out:</p>
+        
+        <div class="emergency-contacts">
+            <div class="emergency-contact-card">
+                <div class="contact-icon">📞</div>
+                <h3>Befrienders Malaysia</h3>
+                <p>24-hour crisis support</p>
+                <a href="tel:+60379568145" class="emergency-call-btn">+603-7956 8145</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">💬</div>
+                <h3>Talian Kasih</h3>
+                <p>Social welfare helpline</p>
+                <a href="tel:15999" class="emergency-call-btn">15999</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">🏥</div>
+                <h3>Campus Counseling</h3>
+                <p>University support services</p>
+                <a th:href="@{/appointments}" class="emergency-book-btn">Book Now</a>
+            </div>
+        </div>
+        
+        <p class="emergency-note">Remember: You are not alone. Help is always available.</p>
+    </div>
+</div>
+
+</body>
+</html>

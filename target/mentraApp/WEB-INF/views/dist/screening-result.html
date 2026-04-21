@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentraHub | Screening Results</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script th:inline="javascript">window.contextPath = /*[[@{/}]]*/ '/mentraApp/';</script>
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        /* Results Page Styles */
+        .results-card {
+            background-color: var(--card);
+            border-radius: 20px;
+            padding: 35px 40px;
+            max-width: 850px;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        
+        /* Header */
+        .results-header {
+            margin-bottom: 25px;
+        }
+        
+        .results-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 5px;
+        }
+        
+        .results-header p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Result Display Box */
+        .result-box {
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        /* Severity Colors */
+        .result-box.minimal {
+            background-color: #E8F5E9;
+            border: 1px solid #A5D6A7;
+        }
+        
+        .result-box.mild {
+            background-color: #FFF8E1;
+            border: 1px solid #FFE082;
+        }
+        
+        .result-box.moderate {
+            background-color: #FFF3E0;
+            border: 1px solid #FFCC80;
+        }
+        
+        .result-box.moderately-severe {
+            background-color: #FFEBEE;
+            border: 1px solid #EF9A9A;
+        }
+        
+        .result-box.severe {
+            background-color: #FCE4EC;
+            border: 1px solid #F48FB1;
+        }
+        
+        .result-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+        }
+        
+        .result-icon.minimal svg {
+            color: #4CAF50;
+        }
+        
+        .result-icon.mild svg {
+            color: #FFC107;
+        }
+        
+        .result-icon.moderate svg {
+            color: #FF9800;
+        }
+        
+        .result-icon.moderately-severe svg {
+            color: #F44336;
+        }
+        
+        .result-icon.severe svg {
+            color: #E91E63;
+        }
+        
+        .result-severity {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .result-score {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Next Steps Box */
+        .next-steps-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background-color: var(--card);
+            border: 1px solid #E0E0E0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .next-steps-box .icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            color: #8B4557;
+        }
+        
+        .next-steps-box h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 8px;
+        }
+        
+        .next-steps-box p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .btn-secondary {
+            flex: 1;
+            padding: 15px;
+            background-color: transparent;
+            border: 1px solid #E0D0D8;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #8B4557;
+            color: #8B4557;
+        }
+        
+        .btn-primary {
+            flex: 1;
+            padding: 15px;
+            background-color: #8B4557;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-primary:hover {
+            background-color: #6B3344;
+        }
+        
+        @media (max-width: 600px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-decoration">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+</div>
+
+<nav class="navbar">
+    <div class="navbar-content">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 35 C8 25 3 15 10 8 C15 3 20 6 20 12 C20 6 25 3 30 8 C37 15 32 25 20 35 Z" fill="#6B1F2B"/>
+                    <path d="M20 35 L20 38" stroke="#6B1F2B" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M20 37 C16 34 14 30 16 27" fill="#6B1F2B"/>
+                    <path d="M20 37 C24 34 26 30 24 27" fill="#6B1F2B"/>
+                </svg>
+            </div>
+            <span class="logo-text">Mentra</span>
+        </div>
+        
+        <ul class="nav-items">
+            <li><a th:href="@{/student/dashboard}" class="nav-item">Home</a></li>
+            <li><a th:href="@{/learning}" class="nav-item">Awareness</a></li>
+            <li><a th:href="@{/screening}" class="nav-item active">Screening</a></li>
+            <li><a th:href="@{/breathing}" class="nav-item">Breathing</a></li>
+            <li><a th:href="@{/appointments}" class="nav-item">Counseling</a></li>
+            <li><a th:href="@{/chatbot}" class="nav-item">Chat bot</a></li>
+            <li><a th:href="@{/settings}" class="nav-item">Profile</a></li>
+            <li><a th:href="@{/referral}" class="nav-item">Help</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="main-content">
+    
+    <div class="results-card">
+        
+        
+        <div class="results-header">
+            <h2>Screening Results</h2>
+            <p id="quizTitle">DASS-21 (Depression, Anxiety, Stress Scale)</p>
+        </div>
+        
+        
+        <div class="result-box" id="resultBox">
+            <div class="result-icon" id="resultIcon">
+                
+            </div>
+            <p class="result-severity" id="resultSeverity">Mild symptoms</p>
+            <p class="result-score">Total Score: <span id="totalScore">0</span></p>
+        </div>
+        
+        
+        <div class="next-steps-box">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+                <h4>Next Steps</h4>
+                <p id="nextStepsText">Your results suggest mild symptoms. Consider talking to a counselor or exploring our awareness resources and coping strategies.</p>
+            </div>
+        </div>
+        
+        
+        <div class="action-buttons">
+            <a th:href="@{/screening}" class="btn-secondary">Take Another Test</a>
+            <a th:href="@{/student/dashboard}" class="btn-primary">Back to Dashboard</a>
+        </div>
+        
+    </div>
+    
+</main>
+
+<script th:inline="javascript">
+    const quizType = /*[[${quizType}]]*/ 'dass21';
+    const score = /*[[${score}]]*/ 0;
+    
+    const quizTitles = {
+        dass21: "DASS-21 (Depression, Anxiety, Stress Scale)",
+        phq9: "PHQ-9 (Patient Health Questionnaire)"
+    };
+    
+    // Severity levels for DASS-21 (combined score for 10 questions, max 30)
+    const dass21Levels = [
+        { max: 5, severity: "Minimal symptoms", class: "minimal", message: "Your results suggest minimal symptoms. Keep maintaining your mental wellness with healthy habits and self-care practices." },
+        { max: 10, severity: "Mild symptoms", class: "mild", message: "Your results suggest mild symptoms. Consider talking to a counselor or exploring our awareness resources and coping strategies." },
+        { max: 15, severity: "Moderate symptoms", class: "moderate", message: "Your results suggest moderate symptoms. We recommend speaking with a mental health professional for guidance and support." },
+        { max: 20, severity: "Moderately severe symptoms", class: "moderately-severe", message: "Your results suggest moderately severe symptoms. Please consider reaching out to a counselor or mental health professional soon." },
+        { max: 30, severity: "Severe symptoms", class: "severe", message: "Your results suggest severe symptoms. We strongly recommend seeking help from a mental health professional as soon as possible." }
+    ];
+    
+    // Severity levels for PHQ-9 (max 27 for 9 questions)
+    const phq9Levels = [
+        { max: 4, severity: "Minimal depression", class: "minimal", message: "Your results suggest minimal or no depression. Continue with your current self-care practices." },
+        { max: 9, severity: "Mild depression", class: "mild", message: "Your results suggest mild depression. Consider monitoring your mood and practicing self-care strategies." },
+        { max: 14, severity: "Moderate depression", class: "moderate", message: "Your results suggest moderate depression. We recommend speaking with a mental health professional." },
+        { max: 19, severity: "Moderately severe depression", class: "moderately-severe", message: "Your results suggest moderately severe depression. Please seek support from a counselor or therapist." },
+        { max: 27, severity: "Severe depression", class: "severe", message: "Your results suggest severe depression. We strongly recommend seeking professional help immediately." }
+    ];
+    
+    const icons = {
+        minimal: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>`,
+        mild: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>`,
+        moderate: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>`,
+        "moderately-severe": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>`,
+        severe: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>`
+    };
+    
+    function init() {
+        // Set quiz title
+        document.getElementById('quizTitle').textContent = quizTitles[quizType] || quizTitles.dass21;
+        document.getElementById('totalScore').textContent = score;
+        
+        // Get severity levels based on quiz type
+        const levels = quizType === 'phq9' ? phq9Levels : dass21Levels;
+        
+        // Find appropriate level
+        let level = levels[levels.length - 1]; // Default to highest
+        for (const l of levels) {
+            if (score <= l.max) {
+                level = l;
+                break;
+            }
+        }
+        
+        // Update UI
+        const resultBox = document.getElementById('resultBox');
+        resultBox.className = 'result-box ' + level.class;
+        
+        const resultIcon = document.getElementById('resultIcon');
+        resultIcon.className = 'result-icon ' + level.class;
+        resultIcon.innerHTML = icons[level.class];
+        
+        document.getElementById('resultSeverity').textContent = level.severity;
+        document.getElementById('nextStepsText').textContent = level.message;
+    }
+    
+    init();
+</script>
+
+</body>
+</html>

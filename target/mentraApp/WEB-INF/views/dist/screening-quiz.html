@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentraHub | Screening Quiz</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script th:inline="javascript">window.contextPath = /*[[@{/}]]*/ '/mentraApp/';</script>
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        /* Quiz Page Styles */
+        .quiz-card {
+            background-color: var(--card);
+            border-radius: 20px;
+            padding: 35px 40px;
+            max-width: 850px;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        
+        /* Quiz Header */
+        .quiz-header {
+            margin-bottom: 25px;
+        }
+        
+        .quiz-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 5px;
+        }
+        
+        .quiz-header .question-count {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .progress-indicator {
+            width: 12px;
+            height: 12px;
+            background-color: #8B4557;
+            border-radius: 3px;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background-color: #F0E0E8;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #8B4557;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Question */
+        .question-section {
+            margin-bottom: 30px;
+        }
+        
+        .question-intro {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: #8B4557;
+            margin-bottom: 25px;
+        }
+        
+        /* Answer Options */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--card);
+            border: 1px solid #E8E0EC;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .option-item:hover {
+            border-color: #8B4557;
+            background-color: #FDF8FA;
+        }
+        
+        .option-item.selected {
+            border-color: #8B4557;
+            background-color: #F8E8EE;
+        }
+        
+        .option-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #C0B0B8;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .option-item.selected .option-radio {
+            border-color: #8B4557;
+        }
+        
+        .option-item.selected .option-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-color: #8B4557;
+            border-radius: 50%;
+        }
+        
+        .option-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        
+        .option-item.selected .option-text {
+            color: #8B4557;
+            font-weight: 500;
+        }
+        
+        /* Navigation Buttons */
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid #F0E0E8;
+        }
+        
+        .btn-prev {
+            padding: 12px 30px;
+            background-color: transparent;
+            border: 1px solid #E0D0D8;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-prev:hover:not(:disabled) {
+            border-color: #8B4557;
+            color: #8B4557;
+        }
+        
+        .btn-prev:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-next {
+            padding: 12px 40px;
+            background-color: #8B4557;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .btn-next:hover:not(:disabled) {
+            background-color: #6B3344;
+        }
+        
+        .btn-next:disabled {
+            background-color: #C0B0B8;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-decoration">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+</div>
+
+<nav class="navbar">
+    <div class="navbar-content">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 35 C8 25 3 15 10 8 C15 3 20 6 20 12 C20 6 25 3 30 8 C37 15 32 25 20 35 Z" fill="#6B1F2B"/>
+                    <path d="M20 35 L20 38" stroke="#6B1F2B" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M20 37 C16 34 14 30 16 27" fill="#6B1F2B"/>
+                    <path d="M20 37 C24 34 26 30 24 27" fill="#6B1F2B"/>
+                </svg>
+            </div>
+            <span class="logo-text">Mentra</span>
+        </div>
+        
+        <ul class="nav-items">
+            <li><a th:href="@{/student/dashboard}" class="nav-item">Home</a></li>
+            <li><a th:href="@{/learning}" class="nav-item">Awareness</a></li>
+            <li><a th:href="@{/screening}" class="nav-item active">Screening</a></li>
+            <li><a th:href="@{/breathing}" class="nav-item">Breathing</a></li>
+            <li><a th:href="@{/appointments}" class="nav-item">Counseling</a></li>
+            <li><a th:href="@{/chatbot}" class="nav-item">Chat bot</a></li>
+            <li><a th:href="@{/settings}" class="nav-item">Profile</a></li>
+            <li><a th:href="@{/referral}" class="nav-item">Help</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="main-content">
+    
+    <div class="quiz-card">
+        
+        
+        <div class="quiz-header">
+            <h2 id="quizTitle">DASS-21 (Depression, Anxiety, Stress Scale)</h2>
+            <p class="question-count">Question <span id="currentQ">1</span> of <span id="totalQ">10</span></p>
+        </div>
+        
+        
+        <div class="progress-container">
+            <div class="progress-indicator"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 10%;"></div>
+            </div>
+        </div>
+        
+        
+        <div class="question-section">
+            <p class="question-intro">Over the past 2 weeks, how often have you been bothered by the following:</p>
+            <p class="question-text" id="questionText">I found it hard to wind down</p>
+            
+            
+            <div class="options-list" id="optionsList">
+                <div class="option-item" onclick="selectOption(this, 0)">
+                    <div class="option-radio"></div>
+                    <span class="option-text">Did not apply to me at all</span>
+                </div>
+                <div class="option-item" onclick="selectOption(this, 1)">
+                    <div class="option-radio"></div>
+                    <span class="option-text">Applied to me to some degree</span>
+                </div>
+                <div class="option-item" onclick="selectOption(this, 2)">
+                    <div class="option-radio"></div>
+                    <span class="option-text">Applied to me a considerable degree</span>
+                </div>
+                <div class="option-item" onclick="selectOption(this, 3)">
+                    <div class="option-radio"></div>
+                    <span class="option-text">Applied to me very much</span>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="quiz-nav">
+            <button class="btn-prev" id="btnPrev" onclick="prevQuestion()" disabled>Previous</button>
+            <button class="btn-next" id="btnNext" onclick="nextQuestion()" disabled>Next</button>
+        </div>
+        
+    </div>
+    
+</main>
+
+<script th:inline="javascript">
+    const quizType = /*[[${quizType}]]*/ 'dass21';
+    const contextPath = /*[[@{/}]]*/ '/mentraApp/';
+    
+    // Quiz data
+    const quizzes = {
+        dass21: {
+            title: "DASS-21 (Depression, Anxiety, Stress Scale)",
+            intro: "Over the past 2 weeks, how often have you been bothered by the following:",
+            options: [
+                { text: "Did not apply to me at all", value: 0 },
+                { text: "Applied to me to some degree", value: 1 },
+                { text: "Applied to me a considerable degree", value: 2 },
+                { text: "Applied to me very much", value: 3 }
+            ],
+            questions: [
+                "I found it hard to wind down",
+                "I was aware of dryness of my mouth",
+                "I couldn't seem to experience any positive feeling at all",
+                "I experienced breathing difficulty",
+                "I found it difficult to work up the initiative to do things",
+                "I tended to over-react to situations",
+                "I experienced trembling (e.g., in the hands)",
+                "I felt that I was using a lot of nervous energy",
+                "I was worried about situations in which I might panic",
+                "I felt that I had nothing to look forward to"
+            ]
+        },
+        phq9: {
+            title: "PHQ-9 (Patient Health Questionnaire)",
+            intro: "Over the last 2 weeks, how often have you been bothered by any of the following problems?",
+            options: [
+                { text: "Not at all", value: 0 },
+                { text: "Several days", value: 1 },
+                { text: "More than half the days", value: 2 },
+                { text: "Nearly every day", value: 3 }
+            ],
+            questions: [
+                "Little interest or pleasure in doing things",
+                "Feeling down, depressed, or hopeless",
+                "Trouble falling or staying asleep, or sleeping too much",
+                "Feeling tired or having little energy",
+                "Poor appetite or overeating",
+                "Feeling bad about yourself or that you are a failure",
+                "Trouble concentrating on things, such as reading or watching TV",
+                "Moving or speaking so slowly that others could notice, or being fidgety",
+                "Thoughts that you would be better off dead, or of hurting yourself"
+            ]
+        }
+    };
+    
+    let currentQuestion = 0;
+    let answers = [];
+    let currentQuiz = quizzes[quizType];
+    
+    // Initialize
+    function init() {
+        document.getElementById('quizTitle').textContent = currentQuiz.title;
+        document.getElementById('totalQ').textContent = currentQuiz.questions.length;
+        answers = new Array(currentQuiz.questions.length).fill(null);
+        renderQuestion();
+    }
+    
+    function renderQuestion() {
+        const total = currentQuiz.questions.length;
+        document.getElementById('currentQ').textContent = currentQuestion + 1;
+        document.getElementById('questionText').textContent = currentQuiz.questions[currentQuestion];
+        
+        // Update progress
+        const progress = ((currentQuestion + 1) / total) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+        
+        // Render options
+        const optionsList = document.getElementById('optionsList');
+        optionsList.innerHTML = currentQuiz.options.map((opt, idx) => `
+            <div class="option-item ${answers[currentQuestion] === opt.value ? 'selected' : ''}" onclick="selectOption(this, ${opt.value})">
+                <div class="option-radio"></div>
+                <span class="option-text">${opt.text}</span>
+            </div>
+        `).join('');
+        
+        // Update buttons
+        document.getElementById('btnPrev').disabled = currentQuestion === 0;
+        document.getElementById('btnNext').disabled = answers[currentQuestion] === null;
+        document.getElementById('btnNext').textContent = currentQuestion === total - 1 ? 'Finish' : 'Next';
+    }
+    
+    function selectOption(element, value) {
+        // Remove selected from all
+        document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
+        // Add selected to clicked
+        element.classList.add('selected');
+        // Save answer
+        answers[currentQuestion] = value;
+        // Enable next button
+        document.getElementById('btnNext').disabled = false;
+    }
+    
+    function prevQuestion() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            renderQuestion();
+        }
+    }
+    
+    function nextQuestion() {
+        const total = currentQuiz.questions.length;
+        if (currentQuestion < total - 1) {
+            currentQuestion++;
+            renderQuestion();
+        } else {
+            // Calculate score
+            const totalScore = answers.reduce((sum, val) => sum + (val || 0), 0);
+            
+            // Determine category based on score
+            let category = 'Normal';
+            if (quizType === 'dass21') {
+                if (totalScore >= 21) category = 'Extremely Severe';
+                else if (totalScore >= 14) category = 'Severe';
+                else if (totalScore >= 10) category = 'Moderate';
+                else if (totalScore >= 5) category = 'Mild';
+            } else { // PHQ-9
+                if (totalScore >= 20) category = 'Severe';
+                else if (totalScore >= 15) category = 'Moderately Severe';
+                else if (totalScore >= 10) category = 'Moderate';
+                else if (totalScore >= 5) category = 'Mild';
+            }
+            
+            // Save to database
+            const params = new URLSearchParams();
+            params.append('screeningType', quizType.toUpperCase());
+            params.append('score', totalScore);
+            params.append('category', category);
+            
+            fetch(contextPath + 'api/screening/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Redirect to results page
+                window.location.href = contextPath + 'screening/result?type=' + quizType + '&score=' + totalScore;
+            })
+            .catch(error => {
+                console.error('Error saving result:', error);
+                // Still redirect even if save fails
+                window.location.href = contextPath + 'screening/result?type=' + quizType + '&score=' + totalScore;
+            });
+        }
+    }
+    
+    // Start
+    init();
+</script>
+
+</body>
+</html>

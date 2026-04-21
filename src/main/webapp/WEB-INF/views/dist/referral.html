@@ -1,0 +1,895 @@
+document.body.classList.add('dark-mode')<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentraHub | Help & Support</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script th:inline="javascript">window.contextPath = /*[[@{/}]]*/ '/mentraApp/';</script>
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        /* Help Page Styles */
+        .help-container {
+            max-width: 850px;
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-bottom: 25px;
+        }
+        
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .page-header p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Crisis Box */
+        .crisis-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background-color: #FFF5F5;
+            border: 1px solid #FFCDD2;
+            border-radius: 15px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+        }
+        
+        .crisis-box .icon {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            color: #E88B8B;
+        }
+        
+        .crisis-box h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #E88B8B;
+            margin-bottom: 5px;
+        }
+        
+        .crisis-box p {
+            font-size: 0.9rem;
+            color: #E88B8B;
+            line-height: 1.5;
+        }
+        
+        /* Action Cards Grid */
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .action-card {
+            background-color: var(--card);
+            border: 1px solid #E8E0EC;
+            border-radius: 15px;
+            padding: 25px;
+        }
+        
+        .action-card-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+        
+        .action-card-icon.counseling {
+            background-color: #F8E8EE;
+            color: #8B4557;
+        }
+        
+        .action-card-icon.feedback {
+            background-color: #E8E0F8;
+            color: var(--primary);
+        }
+        
+        .action-card-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+        
+        .action-card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 8px;
+        }
+        
+        .action-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .action-card .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background-color: #8B4557;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .action-card .btn-primary:hover {
+            background-color: #6B3344;
+        }
+        
+        .action-card .btn-secondary {
+            width: 100%;
+            padding: 12px;
+            background-color: transparent;
+            color: #8B4557;
+            border: 1px solid #E8D5E0;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-card .btn-secondary:hover {
+            background-color: #F8E8EE;
+            border-color: #8B4557;
+        }
+        
+        /* Contact Info Section */
+        .contact-section {
+            background-color: var(--card);
+            border: 1px solid #E8E0EC;
+            border-radius: 15px;
+            padding: 25px;
+        }
+        
+        .contact-section h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 5px;
+        }
+        
+        .contact-section > p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #F0E0E8;
+        }
+        
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+        
+        .contact-item .icon {
+            width: 20px;
+            height: 20px;
+            color: var(--primary);
+        }
+        
+        .contact-item h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 3px;
+        }
+        
+        .contact-item p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background-color: var(--card);
+            border-radius: 20px;
+            max-width: 550px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalIn 0.3s ease;
+        }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-header {
+            padding: 30px 30px 20px;
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+        
+        .modal-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 8px;
+        }
+        
+        .modal-header p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .modal-body {
+            padding: 0 30px 30px;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 10px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background-color: #E8F5E9;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            outline: none;
+        }
+        
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236C74D8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 18px;
+            cursor: pointer;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            padding-top: 10px;
+        }
+        
+        .modal-actions .btn-cancel {
+            flex: 1;
+            padding: 14px;
+            background-color: transparent;
+            border: 1px solid #E0D0D8;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-actions .btn-cancel:hover {
+            border-color: #8B4557;
+            color: #8B4557;
+        }
+        
+        .modal-actions .btn-submit {
+            flex: 1;
+            padding: 14px;
+            background-color: #8B4557;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .modal-actions .btn-submit:hover {
+            background-color: #6B3344;
+        }
+        
+        /* Success Modal */
+        .success-modal {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .success-modal .success-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #E8F5E9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        
+        .success-modal .success-icon svg {
+            width: 32px;
+            height: 32px;
+            color: #4CAF50;
+        }
+        
+        .success-modal h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        
+        .success-modal p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .success-modal .btn-close {
+            margin-top: 25px;
+            padding: 12px 40px;
+            background-color: #8B4557;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .success-modal .btn-close:hover {
+            background-color: #6B3344;
+        }
+        
+        @media (max-width: 600px) {
+            .action-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-decoration">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+</div>
+
+<nav class="navbar">
+    <div class="navbar-content">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 35 C8 25 3 15 10 8 C15 3 20 6 20 12 C20 6 25 3 30 8 C37 15 32 25 20 35 Z" fill="#6B1F2B"/>
+                    <path d="M20 35 L20 38" stroke="#6B1F2B" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M20 37 C16 34 14 30 16 27" fill="#6B1F2B"/>
+                    <path d="M20 37 C24 34 26 30 24 27" fill="#6B1F2B"/>
+                </svg>
+            </div>
+            <span class="logo-text">Mentra</span>
+        </div>
+        
+        <ul class="nav-items">
+            <li><a th:href="@{/student/dashboard}" class="nav-item">Home</a></li>
+            <li><a th:href="@{/learning}" class="nav-item">Awareness</a></li>
+            <li><a th:href="@{/screening}" class="nav-item">Screening</a></li>
+            <li><a th:href="@{/breathing}" class="nav-item">Breathing</a></li>
+            <li><a th:href="@{/appointments}" class="nav-item">Counseling</a></li>
+            <li><a th:href="@{/chatbot}" class="nav-item">Chat bot</a></li>
+            <li><a th:href="@{/settings}" class="nav-item">Profile</a></li>
+            <li><a th:href="@{/referral}" class="nav-item active">Help</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="main-content">
+    
+    <div class="help-container">
+        
+        
+        <div class="page-header">
+            <h1>Help & Support</h1>
+            <p>Request counseling services or provide feedback</p>
+        </div>
+        
+        
+        <div class="crisis-box">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+                <h4>Crisis Support</h4>
+                <p>If you're in crisis or experiencing thoughts of self-harm, please call the National Suicide Prevention Lifeline at 988 or your local emergency services immediately.</p>
+            </div>
+        </div>
+        
+        
+        <div class="action-cards">
+            
+            
+            <div class="action-card">
+                <div class="action-card-icon counseling">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <h3>Request Counseling</h3>
+                <p>Book a session with a professional counselor</p>
+                <button class="btn-primary" onclick="openCounselingModal()">Book a Session</button>
+            </div>
+            
+            
+            <div class="action-card">
+                <div class="action-card-icon feedback">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                </div>
+                <h3>Share Feedback</h3>
+                <p>Help us improve your experience</p>
+                <button class="btn-secondary" onclick="openFeedbackModal()">Give Feedback</button>
+            </div>
+            
+        </div>
+        
+        
+        <div class="contact-section">
+            <h3>Contact Information</h3>
+            <p>Other ways to reach us</p>
+            
+            <div class="contact-item">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <div>
+                    <h4>Phone Support</h4>
+                    <p>1-800-MINDCARE</p>
+                </div>
+            </div>
+            
+            <div class="contact-item">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <div>
+                    <h4>Email Support</h4>
+                    <p>support@mentrahub.com</p>
+                </div>
+            </div>
+            
+            <div class="contact-item">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <div>
+                    <h4>Counseling Center</h4>
+                    <p>Student Wellness Building, Room 201</p>
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+</main>
+
+<div class="modal-overlay" id="counselingModal">
+    <div class="modal">
+        <div class="modal-header">
+            <button class="modal-close" onclick="closeCounselingModal()">&times;</button>
+            <h2>Book Counseling Session</h2>
+            <p>Fill in your preferences and we'll get back to you</p>
+        </div>
+        <div class="modal-body">
+            <form id="counselingForm" onsubmit="submitCounselingRequest(event)">
+                
+                <div class="form-group">
+                    <label>Preferred Date</label>
+                    <input type="date" id="preferredDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Preferred Time</label>
+                    <select id="preferredTime" required>
+                        <option value="">Select a time</option>
+                        <option value="9:00 AM - 10:00 AM">9:00 AM - 10:00 AM</option>
+                        <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+                        <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+                        <option value="1:00 PM - 2:00 PM">1:00 PM - 2:00 PM</option>
+                        <option value="2:00 PM - 3:00 PM">2:00 PM - 3:00 PM</option>
+                        <option value="3:00 PM - 4:00 PM">3:00 PM - 4:00 PM</option>
+                        <option value="4:00 PM - 5:00 PM">4:00 PM - 5:00 PM</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Preferred Contact Method</label>
+                    <select id="contactMethod" required>
+                        <option value="">Select contact method</option>
+                        <option value="Email">Email</option>
+                        <option value="Phone">Phone</option>
+                        <option value="In-person">In-person</option>
+                        <option value="Video Call">Video Call</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Reason for Session (Optional)</label>
+                    <textarea id="reason" placeholder="Briefly describe what you'd like to discuss..."></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeCounselingModal()">Cancel</button>
+                    <button type="submit" class="btn-submit">Submit Request</button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="successModal">
+    <div class="modal success-modal">
+        <button class="modal-close" onclick="closeSuccessModal()" style="position: absolute; top: 15px; right: 20px;">&times;</button>
+        <div class="success-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <h2>Request Submitted</h2>
+        <p>Thank you for requesting a counseling session. A counselor will contact you within 24-48 hours to confirm your appointment.</p>
+        <p>You'll receive a confirmation email at your registered email address.</p>
+        <button class="btn-close" onclick="closeSuccessModal()">Close</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="feedbackSuccessModal">
+    <div class="modal success-modal">
+        <button class="modal-close" onclick="closeFeedbackSuccessModal()" style="position: absolute; top: 15px; right: 20px;">&times;</button>
+        <div class="success-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <h2>Feedback Submitted</h2>
+        <p>Thank you for sharing your feedback! Your input helps us improve our services and better support students like you.</p>
+        <button class="btn-close" onclick="closeFeedbackSuccessModal()">Close</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="feedbackModal">
+    <div class="modal">
+        <div class="modal-header">
+            <button class="modal-close" onclick="closeFeedbackModal()">&times;</button>
+            <h2>Share Your Feedback</h2>
+            <p>Help us improve your experience</p>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="submitFeedback(event)">
+                
+                <div class="form-group">
+                    <label>How would you rate your experience?</label>
+                    <select id="rating" required>
+                        <option value="">Select a rating</option>
+                        <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                        <option value="4">⭐⭐⭐⭐ Good</option>
+                        <option value="3">⭐⭐⭐ Average</option>
+                        <option value="2">⭐⭐ Poor</option>
+                        <option value="1">⭐ Very Poor</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Your Feedback</label>
+                    <textarea id="feedbackText" placeholder="Tell us what you think..." required></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeFeedbackModal()">Cancel</button>
+                    <button type="submit" class="btn-submit">Submit Feedback</button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const contextPath = /*[[@{/}]]*/ '/mentraApp/';
+    
+    // Set minimum date to today
+    document.getElementById('preferredDate').min = new Date().toISOString().split('T')[0];
+    
+    // Check URL params to auto-open modals
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'feedback') {
+        openFeedbackModal();
+    } else if (urlParams.get('action') === 'counseling') {
+        openCounselingModal();
+    }
+    
+    // Counseling Modal
+    function openCounselingModal() {
+        document.getElementById('counselingModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeCounselingModal() {
+        document.getElementById('counselingModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+        document.getElementById('counselingForm').reset();
+    }
+    
+    // Success Modal
+    function closeSuccessModal() {
+        document.getElementById('successModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Feedback Modal
+    function openFeedbackModal() {
+        document.getElementById('feedbackModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeFeedbackModal() {
+        document.getElementById('feedbackModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Submit counseling request
+    function submitCounselingRequest(event) {
+        event.preventDefault();
+        
+        const preferredDate = document.getElementById('preferredDate').value;
+        const preferredTime = document.getElementById('preferredTime').value;
+        const contactMethod = document.getElementById('contactMethod').value;
+        const reason = document.getElementById('reason').value;
+        
+        // Validate required fields
+        if (!preferredDate || !preferredTime || !contactMethod) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+        
+        const params = new URLSearchParams();
+        params.append('preferredDate', preferredDate);
+        params.append('preferredTime', preferredTime);
+        params.append('contactMethod', contactMethod);
+        params.append('reason', reason || '');
+        
+        fetch(contextPath + 'api/counseling/request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeCounselingModal();
+                document.getElementById('counselingForm').reset();
+                document.getElementById('successModal').classList.add('active');
+            } else {
+                alert(data.message || 'There was an error submitting your request.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error submitting your request. Please try again.');
+        });
+    }
+    
+    // Submit feedback to database
+    function submitFeedback(event) {
+        event.preventDefault();
+        
+        const rating = document.getElementById('rating').value;
+        const feedbackText = document.getElementById('feedbackText').value;
+        
+        if (!rating || !feedbackText) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        const params = new URLSearchParams();
+        params.append('rating', rating);
+        params.append('feedbackText', feedbackText);
+        params.append('moduleName', 'Help & Support');
+        
+        fetch(contextPath + 'api/feedback/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeFeedbackModal();
+                document.querySelector('#feedbackModal form').reset();
+                document.getElementById('feedbackSuccessModal').classList.add('active');
+            } else {
+                alert(data.message || 'Error submitting feedback');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error submitting feedback. Please try again.');
+        });
+    }
+    
+    // Close feedback success modal
+    function closeFeedbackSuccessModal() {
+        document.getElementById('feedbackSuccessModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Close modals when clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+                modal.classList.remove('active');
+            });
+            closeEmergencyModal();
+            document.body.style.overflow = 'auto';
+        }
+    });
+    
+    // Emergency Modal Functions
+    function openEmergencyModal() {
+        document.getElementById('emergencyModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeEmergencyModal() {
+        document.getElementById('emergencyModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    document.getElementById('emergencyModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEmergencyModal();
+        }
+    });
+</script>
+
+<!-- Emergency SOS Button -->
+<button class="emergency-fab" onclick="openEmergencyModal()" aria-label="Emergency Help">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+    SOS
+</button>
+
+<!-- Emergency Modal -->
+<div class="emergency-modal" id="emergencyModal">
+    <div class="emergency-modal-content">
+        <button class="emergency-close" onclick="closeEmergencyModal()">&times;</button>
+        <h2>🆘 Need Immediate Help?</h2>
+        <p>If you're in crisis or need immediate support, please reach out:</p>
+        
+        <div class="emergency-contacts">
+            <div class="emergency-contact-card">
+                <div class="contact-icon">📞</div>
+                <h3>Befrienders Malaysia</h3>
+                <p>24-hour crisis support</p>
+                <a href="tel:+60379568145" class="emergency-call-btn">+603-7956 8145</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">💬</div>
+                <h3>Talian Kasih</h3>
+                <p>Social welfare helpline</p>
+                <a href="tel:15999" class="emergency-call-btn">15999</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">🏥</div>
+                <h3>Campus Counseling</h3>
+                <p>University support services</p>
+                <a th:href="@{/appointments}" class="emergency-book-btn">Book Now</a>
+            </div>
+        </div>
+        
+        <p class="emergency-note">Remember: You are not alone. Help is always available.</p>
+    </div>
+</div>
+
+</body>
+</html>

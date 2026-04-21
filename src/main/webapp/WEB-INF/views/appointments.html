@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - Mentra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script th:inline="javascript">window.contextPath = /*[[@{/}]]*/ '/mentraApp/';</script>
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        .appointments-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        /* Booking Form Section */
+        .booking-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .booking-card {
+            background-color: var(--card);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        
+        .booking-card h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .booking-card h2 svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            background-color: #F8F6FA;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        /* Counselor Selection */
+        .counselor-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .counselor-card {
+            padding: 15px 20px;
+            background-color: #F8F6FA;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .counselor-card:hover {
+            border-color: var(--primary);
+        }
+        
+        .counselor-card.selected {
+            border-color: var(--primary);
+            background-color: #EDE8F5;
+        }
+        
+        .counselor-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B4557 0%, #6C74D8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .counselor-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+        
+        .counselor-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Time Slots */
+        .time-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .time-slot {
+            padding: 12px 15px;
+            background-color: #F8F6FA;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        
+        .time-slot:hover:not(.disabled) {
+            border-color: var(--primary);
+        }
+        
+        .time-slot.selected {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .time-slot.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        
+        .no-slots-message {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        /* Submit Button */
+        .btn-book {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #8B4557 0%, #6C74D8 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .btn-book:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 116, 216, 0.3);
+        }
+        
+        .btn-book:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Appointments Lists */
+        .appointments-section {
+            margin-top: 50px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .appointments-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .appointment-card {
+            background-color: var(--card);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+        
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .appointment-date {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .appointment-time {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background-color: #FFF3CD;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background-color: #D4EDDA;
+            color: #155724;
+        }
+        
+        .status-cancelled {
+            background-color: #F8D7DA;
+            color: #721C24;
+        }
+        
+        .status-completed {
+            background-color: #CCE5FF;
+            color: #004085;
+        }
+        
+        /* Status Messages */
+        .status-message {
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .status-accepted {
+            background-color: #D4EDDA;
+            color: #155724;
+            border-left: 4px solid #28A745;
+        }
+        
+        .status-declined {
+            background-color: #F8D7DA;
+            color: #721C24;
+            border-left: 4px solid #DC3545;
+        }
+        
+        .status-waiting {
+            background-color: #FFF3CD;
+            color: #856404;
+            border-left: 4px solid #FFC107;
+        }
+        
+        .appointment-counselor {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .appointment-counselor .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B4557 0%, #6C74D8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .appointment-counselor .name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .appointment-counselor .label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .appointment-reason {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        .btn-cancel {
+            padding: 10px 20px;
+            background-color: transparent;
+            color: #DC3545;
+            border: 1px solid #DC3545;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #DC3545;
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        /* Dark Mode */
+        body.dark-mode .counselor-card,
+        body.dark-mode .time-slot,
+        body.dark-mode .form-group select,
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group textarea {
+            background-color: #2A2A3E;
+        }
+        
+        body.dark-mode .counselor-card.selected,
+        body.dark-mode .time-slot.selected {
+            background-color: var(--primary);
+        }
+        
+        @media (max-width: 900px) {
+            .booking-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .appointments-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-content">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 35 C8 25 3 15 10 8 C15 3 20 6 20 12 C20 6 25 3 30 8 C37 15 32 25 20 35 Z" fill="#6B1F2B"/>
+                    <path d="M20 35 L20 38" stroke="#6B1F2B" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M20 37 C16 34 14 30 16 27" fill="#6B1F2B"/>
+                    <path d="M20 37 C24 34 26 30 24 27" fill="#6B1F2B"/>
+                </svg>
+            </div>
+            <span class="logo-text">Mentra</span>
+        </div>
+        
+        <ul class="nav-items">
+            <li><a th:href="@{/student/dashboard}" class="nav-item">Home</a></li>
+            <li><a th:href="@{/learning}" class="nav-item">Awareness</a></li>
+            <li><a th:href="@{/screening}" class="nav-item">Screening</a></li>
+            <li><a th:href="@{/breathing}" class="nav-item">Breathing</a></li>
+            <li><a th:href="@{/appointments}" class="nav-item active">Appointments</a></li>
+            <li><a th:href="@{/chatbot}" class="nav-item">Chat bot</a></li>
+            <li><a th:href="@{/settings}" class="nav-item">Profile</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="main-content">
+    <div class="appointments-container">
+        
+        <div class="page-header">
+            <h1> Book a Counseling Session</h1>
+            <p>Schedule a confidential appointment with one of our counselors</p>
+        </div>
+        
+        <!-- Booking Form -->
+        <div class="booking-section">
+            
+            <!-- Left: Select Counselor -->
+            <div class="booking-card">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Select Counselor
+                </h2>
+                
+                <div class="counselor-cards" id="counselorCards">
+                    <div th:each="counselor : ${counselors}" 
+                         class="counselor-card"
+                         th:data-id="${counselor.userId}"
+                         th:onclick="'selectCounselor(' + ${counselor.userId} + ', this)'">
+                        <div class="counselor-avatar" th:text="${#strings.substring(counselor.fullName, 0, 1)}">D</div>
+                        <div class="counselor-info">
+                            <h4 th:text="${counselor.fullName}">Dr. Sarah Ahmad</h4>
+                            <p>Licensed Counselor</p>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${#lists.isEmpty(counselors)}" class="no-slots-message">
+                        No counselors available at the moment
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Select Date & Time -->
+            <div class="booking-card">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Select Date & Time
+                </h2>
+                
+                <div class="form-group">
+                    <label for="appointmentDate">Select Date</label>
+                    <input type="date" id="appointmentDate" onchange="loadAvailableSlots()" 
+                           th:min="${minDate}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Available Time Slots</label>
+                    <div class="time-slots-grid" id="timeSlotsGrid">
+                        <div class="no-slots-message">Select a counselor and date to see available slots</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reason">Reason for Visit (Optional)</label>
+                    <textarea id="reason" placeholder="Briefly describe what you'd like to discuss..."></textarea>
+                </div>
+                
+                <button class="btn-book" id="bookBtn" onclick="bookAppointment()" disabled>
+                    Book Appointment
+                </button>
+            </div>
+            
+        </div>
+        
+        <!-- Upcoming Appointments -->
+        <div class="appointments-section" th:if="${!#lists.isEmpty(upcomingAppointments)}">
+            <div class="section-header">
+                <h2>Your Upcoming Appointments</h2>
+            </div>
+            
+            <div class="appointments-grid">
+                <div th:each="apt : ${upcomingAppointments}" class="appointment-card">
+                    <div class="appointment-header">
+                        <div>
+                            <div class="appointment-date" th:text="${apt.formattedFullDate}">Monday, Jan 20, 2026</div>
+                            <div class="appointment-time" th:text="${apt.formattedTimeSlot}">9:00 AM - 10:00 AM</div>
+                        </div>
+                        <span class="status-badge" 
+                              th:classappend="${apt.status.name() == 'PENDING' ? 'status-pending' : 
+                                               (apt.status.name() == 'CONFIRMED' ? 'status-confirmed' : 
+                                               (apt.status.name() == 'CANCELLED' ? 'status-cancelled' : 'status-completed'))}"
+                              th:text="${apt.status}">Pending</span>
+                    </div>
+                    
+                    <!-- Status Message for student -->
+                    <div th:if="${apt.status.name() == 'CONFIRMED'}" class="status-message status-accepted">
+                        ✅ Your appointment has been accepted by the counselor
+                    </div>
+                    <div th:if="${apt.status.name() == 'CANCELLED'}" class="status-message status-declined">
+                        ❌ This appointment was declined or cancelled
+                    </div>
+                    <div th:if="${apt.status.name() == 'PENDING'}" class="status-message status-waiting">
+                        ⏳ Waiting for counselor to accept your appointment
+                    </div>
+                    
+                    <div class="appointment-counselor">
+                        <div class="avatar" th:text="${#strings.substring(apt.counselor.fullName, 0, 1)}">D</div>
+                        <div>
+                            <div class="name" th:text="${apt.counselor.fullName}">Dr. Sarah Ahmad</div>
+                            <div class="label">Counselor</div>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${apt.reason != null and apt.reason != ''}" class="appointment-reason">
+                        <strong>Reason:</strong> <span th:text="${apt.reason}"></span>
+                    </div>
+                    
+                    <button th:if="${apt.status.name() != 'CANCELLED'}" 
+                            class="btn-cancel" 
+                            th:onclick="'cancelAppointment(' + ${apt.appointmentId} + ')'">
+                        Cancel Appointment
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Past Appointments -->
+        <div class="appointments-section" th:if="${!#lists.isEmpty(pastAppointments)}">
+            <div class="section-header">
+                <h2> Past Appointments</h2>
+            </div>
+            
+            <div class="appointments-grid">
+                <div th:each="apt : ${pastAppointments}" class="appointment-card">
+                    <div class="appointment-header">
+                        <div>
+                            <div class="appointment-date" th:text="${apt.formattedFullDate}">Monday, Jan 10, 2026</div>
+                            <div class="appointment-time" th:text="${apt.formattedTimeSlot}">9:00 AM - 10:00 AM</div>
+                        </div>
+                        <span class="status-badge" 
+                              th:classappend="${apt.status.name() == 'COMPLETED' ? 'status-completed' : 
+                                               (apt.status.name() == 'CANCELLED' ? 'status-cancelled' : 'status-pending')}"
+                              th:text="${apt.status}">Completed</span>
+                    </div>
+                    
+                    <div class="appointment-counselor">
+                        <div class="avatar" th:text="${#strings.substring(apt.counselor.fullName, 0, 1)}">D</div>
+                        <div>
+                            <div class="name" th:text="${apt.counselor.fullName}">Dr. Sarah Ahmad</div>
+                            <div class="label">Counselor</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</main>
+
+<!-- Emergency Button -->
+<div class="emergency-fab" onclick="openEmergencyModal()">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+    <span>SOS</span>
+</div>
+
+<!-- Emergency Modal -->
+<div class="emergency-modal" id="emergencyModal">
+    <div class="emergency-modal-content">
+        <button class="emergency-close" onclick="closeEmergencyModal()">&times;</button>
+        <h2>🆘 Emergency Support</h2>
+        <p>If you're in crisis, please reach out immediately:</p>
+        
+        <div class="emergency-contacts">
+            <a href="tel:988" class="emergency-contact-card">
+                <div class="contact-icon">📞</div>
+                <div class="contact-info">
+                    <h4>Suicide & Crisis Lifeline</h4>
+                    <p>Call or Text: 988</p>
+                </div>
+            </a>
+            
+            <a href="tel:0378835000" class="emergency-contact-card">
+                <div class="contact-icon">🏥</div>
+                <div class="contact-info">
+                    <h4>UTM Health Centre</h4>
+                    <p>03-7883 5000</p>
+                </div>
+            </a>
+            
+            <a href="tel:0378834373" class="emergency-contact-card">
+                <div class="contact-icon">🧠</div>
+                <div class="contact-info">
+                    <h4>UTM Counseling Services</h4>
+                    <p>03-7883 4373</p>
+                </div>
+            </a>
+        </div>
+        
+        <p class="emergency-note">You are not alone. Help is available 24/7.</p>
+    </div>
+</div>
+
+<script>
+let selectedCounselorId = null;
+let selectedSlotId = null;
+
+function selectCounselor(counselorId, element) {
+    // Update selection
+    document.querySelectorAll('.counselor-card').forEach(card => card.classList.remove('selected'));
+    element.classList.add('selected');
+    selectedCounselorId = counselorId;
+    
+    // Reset time slot selection
+    selectedSlotId = null;
+    loadAvailableSlots();
+}
+
+function loadAvailableSlots() {
+    const dateInput = document.getElementById('appointmentDate');
+    const slotsGrid = document.getElementById('timeSlotsGrid');
+    
+    if (!selectedCounselorId || !dateInput.value) {
+        slotsGrid.innerHTML = '<div class="no-slots-message">Select a counselor and date to see available slots</div>';
+        updateBookButton();
+        return;
+    }
+    
+    slotsGrid.innerHTML = '<div class="no-slots-message">Loading...</div>';
+    
+    fetch(window.contextPath + 'appointments/available-slots?counselorId=' + selectedCounselorId + '&date=' + dateInput.value)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.slots.length > 0) {
+                slotsGrid.innerHTML = data.slots.map(slot => `
+                    <div class="time-slot" data-slot-id="${slot.slotId}" onclick="selectSlot(${slot.slotId}, this)">
+                        ${slot.label}
+                    </div>
+                `).join('');
+            } else {
+                slotsGrid.innerHTML = '<div class="no-slots-message">No available slots for this date</div>';
+            }
+            updateBookButton();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            slotsGrid.innerHTML = '<div class="no-slots-message">Error loading slots</div>';
+        });
+}
+
+function selectSlot(slotId, element) {
+    document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
+    element.classList.add('selected');
+    selectedSlotId = slotId;
+    updateBookButton();
+}
+
+function updateBookButton() {
+    const bookBtn = document.getElementById('bookBtn');
+    const dateInput = document.getElementById('appointmentDate');
+    
+    bookBtn.disabled = !(selectedCounselorId && selectedSlotId && dateInput.value);
+}
+
+function bookAppointment() {
+    const dateInput = document.getElementById('appointmentDate');
+    const reason = document.getElementById('reason').value;
+    
+    if (!selectedCounselorId || !selectedSlotId || !dateInput.value) {
+        alert('Please select a counselor, date, and time slot');
+        return;
+    }
+    
+    const bookBtn = document.getElementById('bookBtn');
+    bookBtn.disabled = true;
+    bookBtn.textContent = 'Booking...';
+    
+    fetch(window.contextPath + 'appointments/book', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            counselorId: selectedCounselorId,
+            date: dateInput.value,
+            slotId: selectedSlotId,
+            reason: reason
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert(data.message);
+            bookBtn.disabled = false;
+            bookBtn.textContent = 'Book Appointment';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+        bookBtn.disabled = false;
+        bookBtn.textContent = 'Book Appointment';
+    });
+}
+
+function cancelAppointment(appointmentId) {
+    if (!confirm('Are you sure you want to cancel this appointment?')) {
+        return;
+    }
+    
+    fetch(window.contextPath + 'appointments/cancel/' + appointmentId, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
+
+function openEmergencyModal() {
+    document.getElementById('emergencyModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeEmergencyModal() {
+    document.getElementById('emergencyModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeEmergencyModal();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentraHub | Self-Screening</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <script th:inline="javascript">window.contextPath = /*[[@{/}]]*/ '/mentraApp/';</script>
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        /* Self-Screening Page Styles */
+        .page-title-box {
+            background-color: var(--card);
+            border-radius: 30px;
+            padding: 20px 50px;
+            display: inline-block;
+            margin-bottom: 30px;
+            border: 2px solid var(--primary);
+        }
+        
+        .page-title-box h1 {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        /* Screening Card */
+        .screening-card {
+            background-color: var(--card);
+            border-radius: 20px;
+            padding: 35px 40px;
+            max-width: 800px;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        
+        .section-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 8px;
+        }
+        
+        .section-header p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+        }
+        
+        /* Dropdown */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 10px;
+        }
+        
+        .select-wrapper {
+            position: relative;
+        }
+        
+        .select-wrapper select {
+            width: 100%;
+            padding: 15px 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            background-color: #E8F5E9;
+            border: none;
+            border-radius: 10px;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid var(--primary);
+            pointer-events: none;
+        }
+        
+        /* Tool Info Card */
+        .tool-info {
+            background-color: var(--card);
+            border: 1px solid #E0E0E0;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .tool-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #8B4557;
+            margin-bottom: 10px;
+        }
+        
+        .tool-info p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .tool-info .questions-count {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        /* Notice Box */
+        .notice-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background-color: var(--card);
+            border: 1px solid #E0E0E0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .notice-box .icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            color: #E88B8B;
+        }
+        
+        .notice-box h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #E88B8B;
+            margin-bottom: 5px;
+        }
+        
+        .notice-box p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        /* Start Button */
+        .start-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #8B4557;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .start-btn:hover {
+            background-color: #6B3344;
+        }
+        
+        .start-btn:disabled {
+            background-color: #C0C0C0;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-decoration">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+</div>
+
+<nav class="navbar">
+    <div class="navbar-content">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 35 C8 25 3 15 10 8 C15 3 20 6 20 12 C20 6 25 3 30 8 C37 15 32 25 20 35 Z" fill="#6B1F2B"/>
+                    <path d="M20 35 L20 38" stroke="#6B1F2B" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M20 37 C16 34 14 30 16 27" fill="#6B1F2B"/>
+                    <path d="M20 37 C24 34 26 30 24 27" fill="#6B1F2B"/>
+                </svg>
+            </div>
+            <span class="logo-text">Mentra</span>
+        </div>
+        
+        <ul class="nav-items">
+            <li><a th:href="@{/student/dashboard}" class="nav-item">Home</a></li>
+            <li><a th:href="@{/learning}" class="nav-item">Awareness</a></li>
+            <li><a th:href="@{/screening}" class="nav-item active">Screening</a></li>
+            <li><a th:href="@{/breathing}" class="nav-item">Breathing</a></li>
+            <li><a th:href="@{/appointments}" class="nav-item">Counseling</a></li>
+            <li><a th:href="@{/chatbot}" class="nav-item">Chat bot</a></li>
+            <li><a th:href="@{/settings}" class="nav-item">Profile</a></li>
+            <li><a th:href="@{/referral}" class="nav-item">Help</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="main-content">
+    
+    
+    <div class="page-title-box">
+        <h1>Self-screening</h1>
+    </div>
+    
+    
+    <div class="screening-card">
+        
+        <div class="section-header">
+            <h2>Choose a Screening Tool</h2>
+            <p>Select from evidence-based screening assessments</p>
+        </div>
+        
+        
+        <div class="form-group">
+            <label>Screening Tool</label>
+            <div class="select-wrapper">
+                <select id="screeningTool" onchange="updateToolInfo()">
+                    <option value="">-- Select a screening tool --</option>
+                    <option value="dass21">DASS-21 (Depression, Anxiety, Stress)</option>
+                    <option value="phq9">PHQ-9 (Depression)</option>
+                </select>
+            </div>
+        </div>
+        
+        
+        <div class="tool-info" id="toolInfo" style="display: none;">
+            <h3 id="toolTitle">DASS-21 (Depression, Anxiety, Stress Scale)</h3>
+            <p id="toolDescription">A 21-item assessment measuring depression, anxiety, and stress</p>
+            <span class="questions-count" id="toolQuestions">Number of questions: 21</span>
+        </div>
+        
+        
+        <div class="notice-box">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+                <h4>Important Notice</h4>
+                <p>This screening is not a diagnostic tool. Results should be discussed with a qualified mental health professional.</p>
+            </div>
+        </div>
+        
+        
+        <button class="start-btn" id="startBtn" disabled onclick="startScreening()">Start Screening</button>
+        
+    </div>
+    
+</main>
+
+<script th:inline="javascript">
+    const toolData = {
+        dass21: {
+            title: "DASS-21 (Depression, Anxiety, Stress Scale)",
+            description: "A 21-item assessment measuring depression, anxiety, and stress",
+            questions: 10
+        },
+        phq9: {
+            title: "PHQ-9 (Patient Health Questionnaire)",
+            description: "A 9-item questionnaire designed to screen for depression severity",
+            questions: 9
+        }
+    };
+    
+    function updateToolInfo() {
+        const select = document.getElementById('screeningTool');
+        const toolInfo = document.getElementById('toolInfo');
+        const startBtn = document.getElementById('startBtn');
+        const value = select.value;
+        
+        if (value && toolData[value]) {
+            document.getElementById('toolTitle').textContent = toolData[value].title;
+            document.getElementById('toolDescription').textContent = toolData[value].description;
+            document.getElementById('toolQuestions').textContent = `Number of questions: ${toolData[value].questions}`;
+            toolInfo.style.display = 'block';
+            startBtn.disabled = false;
+        } else {
+            toolInfo.style.display = 'none';
+            startBtn.disabled = true;
+        }
+    }
+    
+    function startScreening() {
+        const select = document.getElementById('screeningTool');
+        const value = select.value;
+        if (value) {
+            const contextPath = document.querySelector('link[rel="stylesheet"]').href.split('/css/')[0];
+            window.location.href = contextPath + '/screening/quiz/' + value;
+        }
+    }
+    
+    // Emergency Modal Functions
+    function openEmergencyModal() {
+        document.getElementById('emergencyModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeEmergencyModal() {
+        document.getElementById('emergencyModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    document.getElementById('emergencyModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEmergencyModal();
+        }
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeEmergencyModal();
+        }
+    });
+</script>
+
+<!-- Emergency SOS Button -->
+<button class="emergency-fab" onclick="openEmergencyModal()" aria-label="Emergency Help">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+    SOS
+</button>
+
+<!-- Emergency Modal -->
+<div class="emergency-modal" id="emergencyModal">
+    <div class="emergency-modal-content">
+        <button class="emergency-close" onclick="closeEmergencyModal()">&times;</button>
+        <h2>🆘 Need Immediate Help?</h2>
+        <p>If you're in crisis or need immediate support, please reach out:</p>
+        
+        <div class="emergency-contacts">
+            <div class="emergency-contact-card">
+                <div class="contact-icon">📞</div>
+                <h3>Befrienders Malaysia</h3>
+                <p>24-hour crisis support</p>
+                <a href="tel:+60379568145" class="emergency-call-btn">+603-7956 8145</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">💬</div>
+                <h3>Talian Kasih</h3>
+                <p>Social welfare helpline</p>
+                <a href="tel:15999" class="emergency-call-btn">15999</a>
+            </div>
+            
+            <div class="emergency-contact-card">
+                <div class="contact-icon">🏥</div>
+                <h3>Campus Counseling</h3>
+                <p>University support services</p>
+                <a th:href="@{/appointments}" class="emergency-book-btn">Book Now</a>
+            </div>
+        </div>
+        
+        <p class="emergency-note">Remember: You are not alone. Help is always available.</p>
+    </div>
+</div>
+
+</body>
+</html>
