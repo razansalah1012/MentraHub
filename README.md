@@ -1,112 +1,23 @@
-# MentraHub 
-### Mental Health & Wellness Platform
+MentraHub — Student Mental Health & Wellness Platform
+A full-stack academic web application designed to help students access mental wellness resources, screenings, and counseling appointments.
+Features
+- Student, counselor, and administrator roles
+- Registration, login, and role-based access
+- Counseling appointment scheduling and availability management
+- Mental health screening and self-assessment interfaces
+- Educational resources, breathing exercises, feedback, and chatbot interface
+Tech stack
+Java 17 · Spring MVC 5.3 · Maven · MySQL · HTML · CSS · JavaScript · MVC/DAO architecture
+Repository structure
+- src/main/java/com/mentra/controller/ — request handlers
+- src/main/java/com/mentra/dao/ — data access
+- src/main/java/com/mentra/model/ — domain models
+- src/main/webapp/ — web views and assets
+- database/ — SQL scripts
+Getting started
+1. Install Java 17, Maven, MySQL, and a compatible servlet container.
+2. Review the SQL files in database/ and configure a local database.
+3. Review src/main/resources/application.properties and Spring XML configuration for local settings. Do not commit real credentials.
+4. Build with mvn clean package and deploy the generated WAR to the configured servlet container.
+Exact database initialization and deployment settings depend on your local environment; verify them before publishing step-by-step instructions.
 
-## Overview
-
-**MentraHub** is a comprehensive mental health and wellness platform developed for students to access mental health resources, connect with counselors, and improve overall well-being through digital support tools.
-
-The system was built using **Spring Framework (Java 17)** with an MVC architecture and MySQL database integration.
-
-Mentra helps bridge the gap between students and mental health support services by offering appointment scheduling, screening assessments, wellness tools, and educational resources in one secure platform.
-
----
-
-## Objectives
-
-- Promote mental health awareness among students
-- Provide easier access to counseling support
-- Offer self-screening assessments
-- Reduce stigma around seeking help
-- Improve student wellness through digital tools
-
----
-
-## Key Features
-
-## Core Functionality
-
-- Secure user authentication & login
-- Role-based authorization system
-- Mental health screening assessments
-- Appointment booking system
-- Counselor availability matching
-- Educational wellness resources
-
----
-
-## Wellness Tools
-
-- Guided breathing exercises
-- Stress management support
-- Chatbot assistant for common guidance
-- Mental wellness tips
-- User feedback system
-
----
-
-## User Roles
-
-### Students
-
-- Register & login
-- Complete screenings
-- Book appointments
-- Access wellness tools
-- Track personal progress
-
-### Counselors
-
-- Manage availability
-- View appointments
-- Support students
-- Update schedules
-
-### Administrators
-
-- Manage users
-- Monitor appointments
-- Track platform usage
-- Maintain system operations
-
----
-
-## 🛠Tech Stack
-
-### Backend
-- Java 17
-- Spring Framework 5.3.39
-- Spring MVC
-
-### Frontend
-- HTML5
-- CSS3
-- JavaScript
-
-### Database
-- MySQL
-
-### Architecture
-- MVC Pattern
-- DAO Layer
-
-### Build Tool
-- Maven
-
----
-
-## Project Structure
-
-```bash
-src/main/
-├── java/com/mentra/
-│   ├── controller/
-│   ├── service/
-│   ├── dao/
-│   ├── model/
-│   ├── config/
-│   └── util/
-├── resources/
-└── webapp/
-    ├── WEB-INF/
-    ├── css/
-    └── js/
